@@ -3,10 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:muratech/Screens/MapScreen.dart';
 import 'package:muratech/String_Values.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'LoginPage.dart';
 
 class Dashboard extends StatefulWidget {
+  Dashboard({Key key, this.name});
+  String name;
   @override
   _DashboardState createState() => _DashboardState();
 }
@@ -57,9 +60,13 @@ class _DashboardState extends State<Dashboard> {
                                       fontSize: 16),
                                 ),
                               ),
-                              IconButton(icon: Icon(Icons.logout,color: Colors.white,), onPressed:(){
+                              IconButton(icon: Icon(Icons.logout,color: Colors.white,), onPressed:() async {
                                 LoginScreenState.emailController.text="";
                                 LoginScreenState.passwordController.text="";
+                                SharedPreferences prefs = await SharedPreferences.getInstance();
+                                await prefs.setString('Username', "");
+                                await prefs.setInt('EmpId', 0);
+                                await prefs.setBool('seen', false);
                                 Navigator.pushAndRemoveUntil(
                                   context,
                                   MaterialPageRoute(
@@ -78,12 +85,21 @@ class _DashboardState extends State<Dashboard> {
                         ),
                         Container(
                           width: width,
-                          height: height/10,
+                          height: height/15,
+
                           decoration: BoxDecoration(
 color: Colors.white,
                             image: DecorationImage(image: AssetImage("logo.png")),
+
+
                           ),
                         ),
+              Container(
+                padding: EdgeInsets.all(10),
+                width: width,
+                        color: Colors.white,
+                        child:
+                        Text("Welcome ${widget.name}",style: TextStyle(color: String_values.primarycolor,fontWeight: FontWeight.w700),),),
 
                         SizedBox(
                           height: height / 15,

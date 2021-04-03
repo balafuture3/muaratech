@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:geocoding_platform_interface/src/models/placemark.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:geocoding_platform_interface/src/models/location.dart';
@@ -12,11 +13,14 @@ import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:muratech/Models/CustomerOfficeModel.dart';
+import 'package:muratech/Models/SuccessModel.dart';
 import 'package:muratech/Screens/LoginPage.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:xml/xml.dart' as xml;
 import '../String_Values.dart';
+import 'package:location/location.dart' as locate;
+
 
 class MapScreen extends StatefulWidget {
   MapScreen({Key key, this.username});
@@ -34,6 +38,22 @@ class MapScreenState extends State<MapScreen> {
 
   var enableStartTravel=true;
 
+  String cardcode;
+
+  SuccessResponse li4;
+
+  var enableEndTravel=true;
+
+  var enableWorkStart=true;
+
+  var enableWorkEnd=true;
+
+  Timer timer;
+
+  double currlat;
+
+  double currlon;
+
   Future<http.Response> StartTravel() async {
     setState(() {
       loading = true;
@@ -43,90 +63,426 @@ class MapScreenState extends State<MapScreen> {
   <soap:Body>
     <IN_MOB_INSERT_STARTTRAVEL xmlns="http://tempuri.org/">
       <TRAVELTYPE>${dropdownValue1}</TRAVELTYPE>
-      <CUSTOMERCODE>"${LoginScreenState.li3.empID}"</CUSTOMERCODE>
-      <CUSTOMERNAME>"${LoginScreenState.li3.firstName}"</CUSTOMERNAME>
-      <TRAVELSTART>string</TRAVELSTART>
-      <T_STARTDATE>"${DateFormat("yyyy-MM-dd").format(DateTime.now())}"</T_STARTDATE>
+      <CUSTOMERCODE>${cardcode}</CUSTOMERCODE>
+      <CUSTOMERNAME>${_typeAheadController.text}</CUSTOMERNAME>
+      <TRAVELSTART>Y</TRAVELSTART>
+      <T_STARTDATE>${DateFormat("yyyy-MM-dd").format(DateTime.now())}</T_STARTDATE>
       <T_STARTTIME>${DateFormat("hh:mm a").format(DateTime.now())}</T_STARTTIME>
-      <T_STARTLATLANG>string</T_STARTLATLANG>
-      <T_STARTADDRESS>string</T_STARTADDRESS>
-      <USERID>"${LoginScreenState.li3.empID}"</USERID>
+      <T_STARTLATLANG>${currlat.toString()+','+currlon.toString()}</T_STARTLATLANG>
+      <T_STARTADDRESS>${AddressController.text}</T_STARTADDRESS>
+      <USERID>${LoginScreenState.empID}</USERID>
     </IN_MOB_INSERT_STARTTRAVEL>
   </soap:Body>
 </soap:Envelope>
 
 ''';
     print(envelope);
-//     var url =
-//         'http://15.206.119.30:2021/Muratech/Service.asmx?op=IN_MOB_INSERT_STARTTRAVEL';
-//     // Map data = {
-//     //   "username": EmailController.text,
-//     //   "password": PasswordController.text
-//     // };
-// //    print("data: ${data}");
-// //    print(String_values.base_url);
-//
-//     var response = await http.post(url,
-//         headers: {
-//           "Content-Type": "text/xml; charset=utf-8",
-//         },
-//         body: envelope);
-//     if (response.statusCode == 200) {
-//       setState(() {
-//         loading = false;
-//       });
-//
-//       xml.XmlDocument parsedXml = xml.XmlDocument.parse(response.body);
-//       print(parsedXml.text);
-//       if (parsedXml.text != "[]")
-//       {
-//
-//
-//         final decoded = json.decode(parsedXml.text);
-//         li3 = LoginModel.fromJson(decoded[0]);
-//         print(li3.firstName);
-//
-//         Fluttertoast.showToast(
-//             msg:"Login Success",
-//             toastLength: Toast.LENGTH_LONG,
-//             gravity: ToastGravity.SNACKBAR,
-//             timeInSecForIosWeb: 1,
-//             backgroundColor: String_values.primarycolor,
-//             textColor: Colors.white,
-//             fontSize: 16.0);
-//         Navigator.pushReplacement(
-//           context,
-//           MaterialPageRoute(
-//               builder: (context) =>
-//                   Dashboard()),
-//         );
-//
-//       } else
-//         Fluttertoast.showToast(
-//             msg: "Please check your login details,No users found",
-//             toastLength: Toast.LENGTH_LONG,
-//             gravity: ToastGravity.SNACKBAR,
-//             timeInSecForIosWeb: 1,
-//             backgroundColor: String_values.primarycolor,
-//             textColor: Colors.white,
-//             fontSize: 16.0);
-//     } else {
-//       Fluttertoast.showToast(
-//           msg: "Http error!, Response code ${response.statusCode}",
-//           toastLength: Toast.LENGTH_LONG,
-//           gravity: ToastGravity.SNACKBAR,
-//           timeInSecForIosWeb: 1,
-//           backgroundColor: String_values.primarycolor,
-//           textColor: Colors.white,
-//           fontSize: 16.0);
-//       setState(() {
-//         loading = false;
-//       });
-//       print("Retry");
-//     }
-//     // print("response: ${response.statusCode}");
-//     // print("response: ${response.body}");
-//     return response;
+    var url =
+        'http://15.206.119.30:2021/Muratech/Service.asmx?op=IN_MOB_INSERT_STARTTRAVEL';
+    // Map data = {
+    //   "username": EmailController.text,
+    //   "password": PasswordController.text
+    // };
+//    print("data: ${data}");
+//    print(String_values.base_url);
+
+    var response = await http.post(url,
+        headers: {
+          "Content-Type": "text/xml; charset=utf-8",
+        },
+        body: envelope);
+    if (response.statusCode == 200) {
+      setState(() {
+        loading = false;
+      });
+
+      xml.XmlDocument parsedXml = xml.XmlDocument.parse(response.body);
+      print(parsedXml.text);
+      if (parsedXml.text != "[]")
+      {
+
+
+        final decoded = json.decode(parsedXml.text);
+        li4 = SuccessResponse.fromJson(decoded[0]);
+        print(li4.sTATUSMSG);
+if(li4.sTATUS=="1") {
+  setState(() {
+    enableStartTravel=false;
+  });
+
+  Fluttertoast.showToast(
+      msg: li4.sTATUSMSG,
+      toastLength: Toast.LENGTH_LONG,
+      gravity: ToastGravity.SNACKBAR,
+      timeInSecForIosWeb: 1,
+      backgroundColor: String_values.primarycolor,
+      textColor: Colors.white,
+      fontSize: 16.0);
+}
+else
+  Fluttertoast.showToast(
+      msg: li4.sTATUSMSG,
+      toastLength: Toast.LENGTH_LONG,
+      gravity: ToastGravity.SNACKBAR,
+      timeInSecForIosWeb: 1,
+      backgroundColor: String_values.primarycolor,
+      textColor: Colors.white,
+      fontSize: 16.0);
+        // Navigator.pushReplacement(
+        //   context,
+        //   MaterialPageRoute(
+        //       builder: (context) =>
+        //           Dashboard()),
+        // );
+
+      } else
+        Fluttertoast.showToast(
+            msg: "Please check your login details,No users found",
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.SNACKBAR,
+            timeInSecForIosWeb: 1,
+            backgroundColor: String_values.primarycolor,
+            textColor: Colors.white,
+            fontSize: 16.0);
+    } else {
+      Fluttertoast.showToast(
+          msg: "Http error!, Response code ${response.statusCode}",
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.SNACKBAR,
+          timeInSecForIosWeb: 1,
+          backgroundColor: String_values.primarycolor,
+          textColor: Colors.white,
+          fontSize: 16.0);
+      setState(() {
+        loading = false;
+      });
+      print("Retry");
+    }
+    print("response: ${response.statusCode}");
+    print("response: ${response.body}");
+    return response;
+  }
+  Future<http.Response> EndTravel() async {
+    setState(() {
+      loading = true;
+    });
+    var envelope = '''
+    <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <IN_MOB_INSERT_END_TRAVEL xmlns="http://tempuri.org/">
+      <TRAVELTYPE>${dropdownValue1}</TRAVELTYPE>
+      <CUSTOMERCODE>${cardcode}</CUSTOMERCODE>
+      <CUSTOMERNAME>${_typeAheadController.text}</CUSTOMERNAME>
+      <TRAVELEND>Y</TRAVELEND>
+      <T_ENDDATE>${DateFormat("yyyy-MM-dd").format(DateTime.now())}</T_ENDDATE>
+      <T_ENDTIME>${DateFormat("hh:mm a").format(DateTime.now())}</T_ENDTIME>
+      <T_ENDLATLANG>${currlat.toString()+','+currlon.toString()}</T_ENDLATLANG>
+      <T_ENDADDRESS>${AddressController.text}</T_ENDADDRESS>
+      <USERID>${LoginScreenState.empID}</USERID>
+    </IN_MOB_INSERT_END_TRAVEL>
+  </soap:Body>
+</soap:Envelope>
+''';
+    print(envelope);
+    var url =
+        'http://15.206.119.30:2021/Muratech/Service.asmx?op=IN_MOB_INSERT_END_TRAVEL';
+    // Map data = {
+    //   "username": EmailController.text,
+    //   "password": PasswordController.text
+    // };
+//    print("data: ${data}");
+//    print(String_values.base_url);
+
+    var response = await http.post(url,
+        headers: {
+          "Content-Type": "text/xml; charset=utf-8",
+        },
+        body: envelope);
+    if (response.statusCode == 200) {
+      setState(() {
+        loading = false;
+      });
+
+      xml.XmlDocument parsedXml = xml.XmlDocument.parse(response.body);
+      print(parsedXml.text);
+      if (parsedXml.text != "[]")
+      {
+
+
+        final decoded = json.decode(parsedXml.text);
+        li4 = SuccessResponse.fromJson(decoded[0]);
+        print(li4.sTATUSMSG);
+        if(li4.sTATUS=="1") {
+          setState(() {
+            enableStartTravel=true;
+            enableWorkStart=true;
+            enableWorkEnd=true;
+          });
+
+          Fluttertoast.showToast(
+              msg: li4.sTATUSMSG,
+              toastLength: Toast.LENGTH_LONG,
+              gravity: ToastGravity.SNACKBAR,
+              timeInSecForIosWeb: 1,
+              backgroundColor: String_values.primarycolor,
+              textColor: Colors.white,
+              fontSize: 16.0);
+        }
+        else
+          Fluttertoast.showToast(
+              msg: li4.sTATUSMSG,
+              toastLength: Toast.LENGTH_LONG,
+              gravity: ToastGravity.SNACKBAR,
+              timeInSecForIosWeb: 1,
+              backgroundColor: String_values.primarycolor,
+              textColor: Colors.white,
+              fontSize: 16.0);
+        // Navigator.pushReplacement(
+        //   context,
+        //   MaterialPageRoute(
+        //       builder: (context) =>
+        //           Dashboard()),
+        // );
+
+      } else
+        Fluttertoast.showToast(
+            msg: "Please check your login details,No users found",
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.SNACKBAR,
+            timeInSecForIosWeb: 1,
+            backgroundColor: String_values.primarycolor,
+            textColor: Colors.white,
+            fontSize: 16.0);
+    } else {
+      Fluttertoast.showToast(
+          msg: "Http error!, Response code ${response.statusCode}",
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.SNACKBAR,
+          timeInSecForIosWeb: 1,
+          backgroundColor: String_values.primarycolor,
+          textColor: Colors.white,
+          fontSize: 16.0);
+      setState(() {
+        loading = false;
+      });
+      print("Retry");
+    }
+    print("response: ${response.statusCode}");
+    print("response: ${response.body}");
+    return response;
+  }
+  Future<http.Response> WorkStart() async {
+    setState(() {
+      loading = true;
+    });
+    var envelope = '''
+    <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <IN_MOB_INSERT_STARTCUSPLACENEW xmlns="http://tempuri.org/">
+      <WorkStartLatlang>${currlat.toString()+','+currlon.toString()}</WorkStartLatlang>
+      <WorkStartAddress>${AddressController.text}</WorkStartAddress>
+      <WorkStartCity>${placemarks[0].administrativeArea}</WorkStartCity>
+      <UserID>${LoginScreenState.empID}</UserID>
+      <CUSCODE>${cardcode}</CUSCODE>
+      <CUSNAME>${_typeAheadController.text}</CUSNAME>
+      <WorkStartTypeCode>${dropdownValue1}</WorkStartTypeCode>
+      <WorkStartTypeName>${dropdownValue1}</WorkStartTypeName>
+    </IN_MOB_INSERT_STARTCUSPLACENEW>
+  </soap:Body>
+</soap:Envelope>
+''';
+    print(envelope);
+    var url =
+        'http://15.206.119.30:2021/Muratech/Service.asmx?op=IN_MOB_INSERT_STARTCUSPLACENEW';
+    // Map data = {
+    //   "username": EmailController.text,
+    //   "password": PasswordController.text
+    // };
+//    print("data: ${data}");
+//    print(String_values.base_url);
+
+    var response = await http.post(url,
+        headers: {
+          "Content-Type": "text/xml; charset=utf-8",
+        },
+        body: envelope);
+    if (response.statusCode == 200) {
+      setState(() {
+        loading = false;
+      });
+
+      xml.XmlDocument parsedXml = xml.XmlDocument.parse(response.body);
+      print(parsedXml.text);
+      if (parsedXml.text != "[]")
+      {
+
+
+        final decoded = json.decode(parsedXml.text);
+        li4 = SuccessResponse.fromJson(decoded[0]);
+        print(li4.sTATUSMSG);
+        if(li4.sTATUS=="1") {
+          setState(() {
+            enableWorkStart=false;
+            enableWorkEnd=true;
+          });
+
+          Fluttertoast.showToast(
+              msg: li4.sTATUSMSG,
+              toastLength: Toast.LENGTH_LONG,
+              gravity: ToastGravity.SNACKBAR,
+              timeInSecForIosWeb: 1,
+              backgroundColor: String_values.primarycolor,
+              textColor: Colors.white,
+              fontSize: 16.0);
+        }
+        else
+          Fluttertoast.showToast(
+              msg: li4.sTATUSMSG,
+              toastLength: Toast.LENGTH_LONG,
+              gravity: ToastGravity.SNACKBAR,
+              timeInSecForIosWeb: 1,
+              backgroundColor: String_values.primarycolor,
+              textColor: Colors.white,
+              fontSize: 16.0);
+        // Navigator.pushReplacement(
+        //   context,
+        //   MaterialPageRoute(
+        //       builder: (context) =>
+        //           Dashboard()),
+        // );
+
+      } else
+        Fluttertoast.showToast(
+            msg: "Please check your login details,No users found",
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.SNACKBAR,
+            timeInSecForIosWeb: 1,
+            backgroundColor: String_values.primarycolor,
+            textColor: Colors.white,
+            fontSize: 16.0);
+    } else {
+      Fluttertoast.showToast(
+          msg: "Http error!, Response code ${response.statusCode}",
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.SNACKBAR,
+          timeInSecForIosWeb: 1,
+          backgroundColor: String_values.primarycolor,
+          textColor: Colors.white,
+          fontSize: 16.0);
+      setState(() {
+        loading = false;
+      });
+      print("Retry");
+    }
+    print("response: ${response.statusCode}");
+    print("response: ${response.body}");
+    return response;
+  }
+  Future<http.Response> WorkEnd() async {
+    setState(() {
+      loading = true;
+    });
+    var envelope = '''
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <IN_MOB_INSERT_ENDCUSPLACENEW xmlns="http://tempuri.org/">
+      <WorkEndLatlang>${currlat.toString()+','+currlon.toString()}</WorkEndLatlang>
+      <WorkEndAddress>${AddressController.text}</WorkEndAddress>
+      <WorkEndCity>${placemarks[0].administrativeArea}</WorkEndCity>
+      <UserID>${LoginScreenState.empID}</UserID>
+      <KM>"0"</KM>
+      <CUSCODE>${cardcode}</CUSCODE>
+      <CUSNAME>${_typeAheadController.text}</CUSNAME>
+    </IN_MOB_INSERT_ENDCUSPLACENEW>
+  </soap:Body>
+</soap:Envelope>
+''';
+    print(envelope);
+    var url =
+        'http://15.206.119.30:2021/Muratech/Service.asmx?op=IN_MOB_INSERT_ENDCUSPLACENEW';
+    // Map data = {
+    //   "username": EmailController.text,
+    //   "password": PasswordController.text
+    // };
+//    print("data: ${data}");
+//    print(String_values.base_url);
+
+    var response = await http.post(url,
+        headers: {
+          "Content-Type": "text/xml; charset=utf-8",
+        },
+        body: envelope);
+    if (response.statusCode == 200) {
+      setState(() {
+        loading = false;
+      });
+
+      xml.XmlDocument parsedXml = xml.XmlDocument.parse(response.body);
+      print(parsedXml.text);
+      if (parsedXml.text != "[]")
+      {
+
+
+        final decoded = json.decode(parsedXml.text);
+        li4 = SuccessResponse.fromJson(decoded[0]);
+        print(li4.sTATUSMSG);
+        if(li4.sTATUS=="1") {
+          setState(() {
+            enableWorkEnd=false;
+            enableWorkStart=true;
+          });
+
+          Fluttertoast.showToast(
+              msg: li4.sTATUSMSG,
+              toastLength: Toast.LENGTH_LONG,
+              gravity: ToastGravity.SNACKBAR,
+              timeInSecForIosWeb: 1,
+              backgroundColor: String_values.primarycolor,
+              textColor: Colors.white,
+              fontSize: 16.0);
+        }
+        else
+          Fluttertoast.showToast(
+              msg: li4.sTATUSMSG,
+              toastLength: Toast.LENGTH_LONG,
+              gravity: ToastGravity.SNACKBAR,
+              timeInSecForIosWeb: 1,
+              backgroundColor: String_values.primarycolor,
+              textColor: Colors.white,
+              fontSize: 16.0);
+        // Navigator.pushReplacement(
+        //   context,
+        //   MaterialPageRoute(
+        //       builder: (context) =>
+        //           Dashboard()),
+        // );
+
+      } else
+        Fluttertoast.showToast(
+            msg: "Please check your login details,No users found",
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.SNACKBAR,
+            timeInSecForIosWeb: 1,
+            backgroundColor: String_values.primarycolor,
+            textColor: Colors.white,
+            fontSize: 16.0);
+    } else {
+      Fluttertoast.showToast(
+          msg: "Http error!, Response code ${response.statusCode}",
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.SNACKBAR,
+          timeInSecForIosWeb: 1,
+          backgroundColor: String_values.primarycolor,
+          textColor: Colors.white,
+          fontSize: 16.0);
+      setState(() {
+        loading = false;
+      });
+      print("Retry");
+    }
+    print("response: ${response.statusCode}");
+    print("response: ${response.body}");
+    return response;
   }
 
 
@@ -168,6 +524,7 @@ class MapScreenState extends State<MapScreen> {
       final decoded = json.decode(parsedXml.text);
       li3 = CustomerOfficeList.fromJson(decoded);
       print(li3.details[0].cardName);
+
       // setState(() {
       //   stringlist.clear();
       //   stringlist.add("Select Category");
@@ -245,14 +602,29 @@ class MapScreenState extends State<MapScreen> {
 
   BitmapDescriptor pinLocationIcon;
   BitmapDescriptor pinLocationIcon1;
-
-
+  List<Placemark> placemarks;
+  locate.Location location = new locate.Location();
   List<Location> locations;
 
   void initState() {
     getlocation().then((value) {
 
+      currlat=position.latitude;
+
+      currlon=position.longitude;
+      placefromLATLNG();
     });
+    // location.onLocationChanged.listen((locate.LocationData currentLocation) {
+    //
+    //   currlat=currentLocation.latitude;
+    //   currlon=currentLocation.longitude;
+    //
+    //   print("changed");
+    //
+    //     placefromLATLNG();
+    //
+    //   // Use current location
+    // });
     super.initState();
   }
 
@@ -301,6 +673,7 @@ class MapScreenState extends State<MapScreen> {
 
                         child: Column(
                           children: [
+                            SizedBox(height: height/50,),
                             Padding(
                               padding: const EdgeInsets.only(left:16,right:16,bottom: 16),
                               child: Row(
@@ -314,7 +687,7 @@ class MapScreenState extends State<MapScreen> {
                                     decoration: InputDecoration(
                                       labelText: "Your Address",
                                       border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(25.0),
+                                        borderRadius: BorderRadius.circular(5.0),
                                       ),
 
                                     ),
@@ -327,7 +700,7 @@ class MapScreenState extends State<MapScreen> {
                             Container(
                               height: 55,
                               margin: const EdgeInsets.only(left: 16.0, right: 16.0),
-                              padding: const EdgeInsets.only(left:24,right: 24,top: 6,bottom: 6),
+                              padding: const EdgeInsets.only(left:24,right: 24,top: 16,bottom: 6),
                               decoration: new BoxDecoration(
                                   borderRadius: BorderRadius.all(Radius.circular(25.0)),
                                   border: new Border.all(color: Colors.black38)),
@@ -407,18 +780,18 @@ class MapScreenState extends State<MapScreen> {
                                   });
 
                                   // postRequest(suggestion);
-                                  // for (int i = 0; i < li3.data.length; i++) {
-                                  //   print(li3.data[i].itemName);
-                                  //   if ("${li3.data[i].itemName}" == suggestion) {
-                                  //     itemcode = li3.data[i].itemCode;
-                                  //
-                                  //     // CustomerCodeController.text=li3.details[i].customer;
-                                  //     //
-                                  //     // dropdowncall(li3.details[i].customer);
-                                  //     // OutboundController.text=li3.details[i].delivery;
-                                  //
-                                  //   }
-                                  // }
+                                  for (int i = 0; i < li3.details.length; i++) {
+                                    print(li3.details[i].cardName);
+                                    if ("${li3.details[i].cardName}" == suggestion) {
+                                      cardcode = li3.details[i].cardCode;
+
+                                      // CustomerCodeController.text=li3.details[i].customer;
+                                      //
+                                      // dropdowncall(li3.details[i].customer);
+                                      // OutboundController.text=li3.details[i].delivery;
+
+                                    }
+                                  }
                                   this._typeAheadController.text = suggestion;
                                 },
                                 validator: (value) {
@@ -435,7 +808,13 @@ class MapScreenState extends State<MapScreen> {
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
                                 RaisedButton(onPressed: enableStartTravel?(){
-                                  StartTravel();
+                                  if(dropdownValue1!="Select Type"&&_typeAheadController.text!=""&&_typeAheadController.text!="Select Customer"&&_typeAheadController.text!="Select Office")
+
+                                    getlocation().then((value) {
+                                    placefromLATLNG();
+                                  }).then((value) => StartTravel());
+                                  else
+                                    Fluttertoast.showToast(msg: "Please Select Type and Customer or Office");
                                 }:null,child: Text("Start Travel",style: TextStyle(color: Colors.white)),
                                   elevation: 5,
                                   color: String_values.primarycolor,
@@ -444,7 +823,15 @@ class MapScreenState extends State<MapScreen> {
                                     BorderRadius.circular(25.0),
                                   ),
                                 ),
-                                RaisedButton(onPressed: (){},child: Text("End Travel",style: TextStyle(color: Colors.white)),
+                                RaisedButton(onPressed: enableEndTravel?(){
+                                  if(dropdownValue1!="Select Type"&&_typeAheadController.text!=""&&_typeAheadController.text!="Select Customer"&&_typeAheadController.text!="Select Office")
+
+                                    getlocation().then((value) {
+                                    placefromLATLNG();
+                                  }).then((value) => EndTravel());
+                                  else
+                                    Fluttertoast.showToast(msg: "Please Select Type and Customer or Office");
+                                }:null,child: Text("End Travel",style: TextStyle(color: Colors.white)),
                                   elevation: 5,
                                   color: String_values.primarycolor,
                                   shape: RoundedRectangleBorder(
@@ -460,12 +847,27 @@ class MapScreenState extends State<MapScreen> {
                               children: [
                                 RaisedButton(
                                   color: String_values.primarycolor,
-                                  onPressed: (){},child: Text("Work Start",style: TextStyle(color: Colors.white),),  elevation: 5,
+                                  onPressed: enableWorkStart?(){
+                                    if(dropdownValue1!="Select Type"&&_typeAheadController.text!=""&&_typeAheadController.text!="Select Customer"&&_typeAheadController.text!="Select Office")
+
+                                      getlocation().then((value) {
+                                      placefromLATLNG();
+                                    }).then((value) => WorkStart());
+                                    else
+                                      Fluttertoast.showToast(msg: "Please Select Type and Customer or Office");
+                                  }:null,child: Text("Work Start",style: TextStyle(color: Colors.white),),  elevation: 5,
                                   shape: RoundedRectangleBorder(
                                     borderRadius:
                                     BorderRadius.circular(25.0),
                                   ),),
-                                RaisedButton(onPressed: (){},child: Text("Work End",style: TextStyle(color: Colors.white)),
+                                RaisedButton(onPressed: enableWorkEnd?(){
+                                  if(dropdownValue1!="Select Type"&&_typeAheadController.text!=""&&_typeAheadController.text!="Select Customer"&&_typeAheadController.text!="Select Office")
+                                  getlocation().then((value) {
+                                    placefromLATLNG();
+                                  }).then((value) =>WorkEnd());
+                                  else
+                                    Fluttertoast.showToast(msg: "Please Select Type and Customer or Office");
+                                }:null,child: Text("Work End",style: TextStyle(color: Colors.white)),
                                   elevation: 5,
                                   color: String_values.primarycolor,
                                   shape: RoundedRectangleBorder(
@@ -521,13 +923,7 @@ class MapScreenState extends State<MapScreen> {
       position: LatLng(position.latitude, position.longitude),
     );
 
-    setState(() {
-      markers.add(marker);
-      _kGooglePlex = CameraPosition(
-          target: LatLng(position.latitude, position.longitude), zoom: 10);
 
-      loading = false; //    print("Markers "+markers.length.toString());
-    });
   }
 
   Future<void> getlocationfromAddress(address) async {
@@ -549,6 +945,20 @@ class MapScreenState extends State<MapScreen> {
     setState(() {
       controller.moveCamera(CameraUpdate.newLatLngBounds(getBounds(listmarker), 150));
     });
+  }
+
+  Future<void> placefromLATLNG() async {
+    setState(() {
+      markers.clear();
+      markers.add(marker);
+      _kGooglePlex = CameraPosition(
+          target: LatLng(currlat, currlon), zoom: 16);
+
+      loading = false; //    print("Markers "+markers.length.toString());
+    });
+   placemarks = await placemarkFromCoordinates(currlat, currlon);
+   AddressController.text=placemarks[0].name+','+placemarks[0].street+','+placemarks[0].locality+','+placemarks[0].subLocality+','+placemarks[0].administrativeArea+','+placemarks[0].country+','+placemarks[0].postalCode;
+   print(AddressController.text);
   }
 }
 class BackendService {

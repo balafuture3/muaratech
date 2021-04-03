@@ -4,6 +4,7 @@ import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:muratech/Models/LoginModel.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:xml/xml.dart' as xml;
 import 'package:http/http.dart'as http;
 
@@ -21,7 +22,15 @@ class LoginScreen extends StatefulWidget {
 class LoginScreenState extends State<LoginScreen> {
   static LoginModel li3;
 
+  static var empID;
 
+  Future<bool> setRegistered(username, empid) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('Username', username);
+    await prefs.setInt('EmpId', empid);
+    await prefs.setBool('seen', true);
+    return true;
+  }
 
   // LoginResponseList li;
 
@@ -70,7 +79,8 @@ class LoginScreenState extends State<LoginScreen> {
         final decoded = json.decode(parsedXml.text);
         li3 = LoginModel.fromJson(decoded[0]);
         print(li3.firstName);
-
+        empID= li3.empID;
+        setRegistered(li3.firstName, li3.empID);
         Fluttertoast.showToast(
             msg:"Login Success",
             toastLength: Toast.LENGTH_LONG,
@@ -83,7 +93,7 @@ class LoginScreenState extends State<LoginScreen> {
           context,
           MaterialPageRoute(
               builder: (context) =>
-                  Dashboard()),
+                  Dashboard(name: li3.firstName,)),
         );
 
       } else
