@@ -281,7 +281,7 @@ else
     <IN_MOB_INSERT_STARTCUSPLACENEW xmlns="http://tempuri.org/">
       <WorkStartLatlang>${currlat.toString()+','+currlon.toString()}</WorkStartLatlang>
       <WorkStartAddress>${AddressController.text}</WorkStartAddress>
-      <WorkStartCity>${placemarks[0].administrativeArea}</WorkStartCity>
+      <WorkStartCity>${placemarks[0].locality}</WorkStartCity>
       <UserID>${LoginScreenState.empID}</UserID>
       <CUSCODE>${cardcode}</CUSCODE>
       <CUSNAME>${_typeAheadController.text}</CUSNAME>
@@ -388,7 +388,7 @@ else
     <IN_MOB_INSERT_ENDCUSPLACENEW xmlns="http://tempuri.org/">
       <WorkEndLatlang>${currlat.toString()+','+currlon.toString()}</WorkEndLatlang>
       <WorkEndAddress>${AddressController.text}</WorkEndAddress>
-      <WorkEndCity>${placemarks[0].administrativeArea}</WorkEndCity>
+      <WorkEndCity>${placemarks[0].locality}</WorkEndCity>
       <UserID>${LoginScreenState.empID}</UserID>
       <KM>"0"</KM>
       <CUSCODE>${cardcode}</CUSCODE>
@@ -614,17 +614,25 @@ else
       currlon=position.longitude;
       placefromLATLNG();
     });
-    // location.onLocationChanged.listen((locate.LocationData currentLocation) {
-    //
-    //   currlat=currentLocation.latitude;
-    //   currlon=currentLocation.longitude;
-    //
-    //   print("changed");
-    //
-    //     placefromLATLNG();
-    //
-    //   // Use current location
-    // });
+//     location.onLocationChanged.listen((locate.LocationData currentLocation) {
+// setState(() {
+//   currlat=currentLocation.latitude;
+//   currlon=currentLocation.longitude;
+//
+//   print("changed");
+//
+//   placefromLATLNG().then((value)
+//   async {
+//     GoogleMapController controller = await _controller.future;
+//     setState(() {
+//       controller.animateCamera(CameraUpdate.newLatLng(LatLng(currlat, currlon)));
+//     });
+//   });
+// });
+//
+//
+//       // Use current location
+//     });
     super.initState();
   }
 
@@ -654,8 +662,13 @@ else
                 // alignment: Alignment.bottomCenter,
                 children: [
                   GoogleMap(
+                    padding: EdgeInsets.only(top:height/2),
 
+myLocationEnabled: true,
+
+                    myLocationButtonEnabled: true,
                     mapType: MapType.normal,
+
                     initialCameraPosition: _kGooglePlex,
                     onMapCreated: (GoogleMapController controller) {
                       _controller.complete(controller);
@@ -673,7 +686,7 @@ else
 
                         child: Column(
                           children: [
-                            SizedBox(height: height/50,),
+
                             Padding(
                               padding: const EdgeInsets.only(left:16,right:16,bottom: 16),
                               child: Row(
@@ -682,9 +695,11 @@ else
                                   Expanded(flex:4,child: TextField(
                                     controller: AddressController,
                                     enabled: false,
-                                    minLines: 3,
+                                    minLines: 2,
                                     maxLines: 25,
+                                    style: TextStyle(fontSize: 12),
                                     decoration: InputDecoration(
+
                                       labelText: "Your Address",
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(5.0),
@@ -698,9 +713,9 @@ else
                               ),
                             ),
                             Container(
-                              height: 55,
+                              height: 50,
                               margin: const EdgeInsets.only(left: 16.0, right: 16.0),
-                              padding: const EdgeInsets.only(left:24,right: 24,top: 16,bottom: 6),
+                              padding: const EdgeInsets.only(left:24,right: 10,top: 10,bottom: 10),
                               decoration: new BoxDecoration(
                                   borderRadius: BorderRadius.all(Radius.circular(25.0)),
                                   border: new Border.all(color: Colors.black38)),
@@ -734,7 +749,7 @@ else
                               ),
                             ),
                             Container(
-                              height: 55,
+                              height: 50,
                               margin: const EdgeInsets.only(
                                   left: 16.0, right: 16.0, top: 16),
                               child: TypeAheadFormField(
@@ -948,17 +963,24 @@ else
   }
 
   Future<void> placefromLATLNG() async {
-    setState(() {
-      markers.clear();
-      markers.add(marker);
-      _kGooglePlex = CameraPosition(
-          target: LatLng(currlat, currlon), zoom: 16);
 
-      loading = false; //    print("Markers "+markers.length.toString());
-    });
    placemarks = await placemarkFromCoordinates(currlat, currlon);
-   AddressController.text=placemarks[0].name+','+placemarks[0].street+','+placemarks[0].locality+','+placemarks[0].subLocality+','+placemarks[0].administrativeArea+','+placemarks[0].country+','+placemarks[0].postalCode;
+   AddressController.text=placemarks[0].name+','+placemarks[0].street+','+placemarks[0].subLocality+','+placemarks[0].locality+','+placemarks[0].administrativeArea+','+placemarks[0].country+','+placemarks[0].postalCode;
    print(AddressController.text);
+   setState(() {
+     marker = Marker(
+       markerId: MarkerId("Driver"),
+       position: LatLng(currlat, currlon),
+     );
+     markers.clear();
+     markers.add(marker);
+     _kGooglePlex = CameraPosition(
+         target: LatLng(currlat, currlon), zoom: 16);
+
+     loading = false;
+     //    print("Markers "+markers.length.toString());
+   });
+
   }
 }
 class BackendService {
