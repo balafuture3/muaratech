@@ -67,6 +67,7 @@ flutter:
     - logo.png
     - attendence.png
     - logo 2.png
+    - viewattendence.png
 
 flutter_icons:
   android: "launcher_icon"

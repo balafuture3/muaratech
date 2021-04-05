@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:muratech/Screens/MapScreen.dart';
+import 'package:muratech/Screens/ViewAttendence.dart';
 import 'package:muratech/String_Values.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -177,6 +178,46 @@ color: Colors.white,
                                                 children: [
                                                   Text(
                                                     "Attendance",
+                                                    style: TextStyle(
+                                                        color: String_values.primarycolor,fontWeight: FontWeight.w700),
+                                                  ),
+                                                ],
+                                              ))
+                                        ],
+                                      )),
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => ViewAttendence()),
+                                    );
+                                  },
+                                  child: Card(
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                          BorderRadius.circular(10.0)),
+                                      elevation: 8,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                        children: [
+                                          Image.asset("viewattendence.png",
+                                              height: height / 8,
+                                              width: double.infinity),
+                                          SizedBox(
+                                            height: height / 40,
+                                          ),
+                                          Container(
+                                              padding: EdgeInsets.all(3),
+                                              width: double.infinity,
+
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: [
+                                                  Text(
+                                                    "View Attendance",
                                                     style: TextStyle(
                                                         color: String_values.primarycolor,fontWeight: FontWeight.w700),
                                                   ),

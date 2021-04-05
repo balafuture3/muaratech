@@ -87,13 +87,22 @@ class _LandingState extends State<Landing> {
   }
   @override
   void initState() {
-    checkFirstSeen().then((value) => Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>_seen==true?Dashboard(name: LoginScreenState.emailController.text,):LoginScreen()), (route) => false));
+   Future.delayed(Duration(seconds: 2)).then((value) =>  checkFirstSeen().then((value) => Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>_seen==true?Dashboard(name: LoginScreenState.emailController.text,):LoginScreen()), (route) => false)));
     // TODO: implement initState
     super.initState();
   }
   @override
   Widget build(BuildContext context) {
-    return Center(child: Container( child: CircularProgressIndicator()));
+    return Container(
+        color: Colors.white,
+        child: Center(child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset("logo.png"),
+            SizedBox(height: MediaQuery.of(context).size.height/20,),
+            CircularProgressIndicator(),
+          ],
+        )));
   }
 }
 

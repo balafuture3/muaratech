@@ -901,9 +901,9 @@ myLocationEnabled: true,
                 ],
               )),
             ),
-        // appBar: AppBar(
-        //   title: Text("Attendence"),
-        // ),
+        appBar: AppBar(
+          title: Text("Attendence"),
+        ),
         // floatingActionButton: FloatingActionButton(
         //     child: Icon(Icons.directions),
         //     onPressed: () {
