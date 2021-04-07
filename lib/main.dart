@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:muratech/Screens/DashBoard.dart';
+import 'package:muratech/Screens/MapScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'Screens/LoginPage.dart';
@@ -79,6 +80,7 @@ class _LandingState extends State<Landing> {
       print(LoginScreenState.emailController.text);
       // print(LoginScreenState.li3.empID);
     } else {
+      MapScreenState.setStatus(false, false,false,false);
       // Set the flag to true at the end of onboarding screen if everything is successfull and so I am commenting it out
       // await prefs.setBool('seen', true);
       print('Open sequence: First Time');

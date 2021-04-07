@@ -254,33 +254,33 @@ class LoginScreenState extends State<LoginScreen> {
               SizedBox(
                 height: height / 50,
               ),
-              Container(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: <Widget>[
-                    GestureDetector(
-                      onTap: () {},
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 24.0),
-                        child: GestureDetector(
-                          child: Container(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Text("Forgot Password?",style: TextStyle(color: String_values.primarycolor),),
-                          ),
-                          onTap: () {
-                            // Navigator.pushReplacement(
-                            //   context,
-                            //   MaterialPageRoute(
-                            //       builder: (context) =>
-                            //           ForgotPasswordPage()),
-                            // );
-                          },
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              // Container(
+              //   child: Row(
+              //     mainAxisAlignment: MainAxisAlignment.end,
+              //     children: <Widget>[
+              //       GestureDetector(
+              //         onTap: () {},
+              //         child: Padding(
+              //           padding: const EdgeInsets.only(right: 24.0),
+              //           child: GestureDetector(
+              //             child: Container(
+              //               padding: const EdgeInsets.all(16.0),
+              //               child: Text("Forgot Password?",style: TextStyle(color: String_values.primarycolor),),
+              //             ),
+              //             onTap: () {
+              //               // Navigator.pushReplacement(
+              //               //   context,
+              //               //   MaterialPageRoute(
+              //               //       builder: (context) =>
+              //               //           ForgotPasswordPage()),
+              //               // );
+              //             },
+              //           ),
+              //         ),
+              //       ),
+              //     ],
+              //   ),
+              // ),
               SizedBox(
                 height: height / 25,
               ),

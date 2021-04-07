@@ -12,9 +12,11 @@ import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:muratech/Models/CheckValidationModel.dart';
 import 'package:muratech/Models/CustomerOfficeModel.dart';
 import 'package:muratech/Models/SuccessModel.dart';
 import 'package:muratech/Screens/LoginPage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:xml/xml.dart' as xml;
@@ -54,6 +56,117 @@ class MapScreenState extends State<MapScreen> {
 
   double currlon;
 
+  CheckValidationModel li5;
+
+  bool enableTypeahead= true;
+
+  bool enableDropdown=true;
+
+  Future<http.Response> CheckValidation() async {
+    setState(() {
+      loading = true;
+    });
+    var envelope = '''
+<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <IN_MOB_CHECKVALIDATION xmlns="http://tempuri.org/">
+      <USERID>${LoginScreenState.empID}</USERID>
+    </IN_MOB_CHECKVALIDATION>
+  </soap:Body>
+</soap:Envelope>
+
+''';
+    print(envelope);
+    var url =
+        'http://15.206.119.30:2021/Muratech/Service.asmx?op=IN_MOB_CHECKVALIDATION';
+    // Map data = {
+    //   "username": EmailController.text,
+    //   "password": PasswordController.text
+    // };
+//    print("data: ${data}");
+//    print(String_values.base_url);
+
+    var response = await http.post(url,
+        headers: {
+          "Content-Type": "text/xml; charset=utf-8",
+        },
+        body: envelope);
+    if (response.statusCode == 200) {
+      setStatus(true, false,false,false);
+      setState(() {
+        loading = false;
+      });
+
+      xml.XmlDocument parsedXml = xml.XmlDocument.parse(response.body);
+      print(parsedXml.text);
+      if (parsedXml.text != "[]")
+      {
+
+
+        final decoded = json.decode(parsedXml.text);
+        li5 = CheckValidationModel.fromJson(decoded[0]);
+        print(li5.cUSTOMERNAME);
+        setState(() {
+         if (li5.wSTARTCUSPLACE=="Y"&&li5.wENDCUSPLACE=="Y"&&li5.tRAVELSTART=="Y"&&li5.tRAVELEND=="Y") {
+
+         }
+         else {
+           dropdownValue1=li5.tRAVELTYPE;
+           _typeAheadController.text=li5.cUSTOMERNAME;
+           cardcode=li5.cUSTOMERCODE;
+           if(li5.wSTARTCUSPLACE == "Y" && li5.wENDCUSPLACE == "N") {
+             enableTypeahead = false;
+             enableDropdown = false;
+           }
+           else
+           {
+             enableTypeahead = true;
+             enableDropdown = true;
+           }
+           li5.wSTARTCUSPLACE == "Y" ? enableWorkStart = false : true;
+           if(li5.wENDCUSPLACE == "Y") { enableWorkEnd = false;enableWorkStart = true ;}else enableWorkEnd = true;
+           li5.tRAVELSTART == "Y" ? enableStartTravel = false : true;
+           li5.tRAVELEND == "Y" ? enableEndTravel = false : true;
+         }
+        });
+
+
+        // Navigator.pushReplacement(
+        //   context,
+        //   MaterialPageRoute(
+        //       builder: (context) =>
+        //           Dashboard()),
+        // );
+
+      } else
+        Fluttertoast.showToast(
+            msg: "Please check your login details,No users found",
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.SNACKBAR,
+            timeInSecForIosWeb: 1,
+            backgroundColor: String_values.primarycolor,
+            textColor: Colors.white,
+            fontSize: 16.0);
+    } else {
+      Fluttertoast.showToast(
+          msg: "Http error!, Response code ${response.statusCode}",
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.SNACKBAR,
+          timeInSecForIosWeb: 1,
+          backgroundColor: String_values.primarycolor,
+          textColor: Colors.white,
+          fontSize: 16.0);
+      setState(() {
+        loading = false;
+      });
+      print("Retry");
+    }
+    print("response: ${response.statusCode}");
+    print("response: ${response.body}");
+    return response;
+  }
+
   Future<http.Response> StartTravel() async {
     setState(() {
       loading = true;
@@ -92,6 +205,7 @@ class MapScreenState extends State<MapScreen> {
         },
         body: envelope);
     if (response.statusCode == 200) {
+      setStatus(true, false,false,false);
       setState(() {
         loading = false;
       });
@@ -214,6 +328,7 @@ else
         print(li4.sTATUSMSG);
         if(li4.sTATUS=="1") {
           setState(() {
+            setStatus(false, false,false,false);
             enableStartTravel=true;
             enableWorkStart=true;
             enableWorkEnd=true;
@@ -321,7 +436,10 @@ else
         li4 = SuccessResponse.fromJson(decoded[0]);
         print(li4.sTATUSMSG);
         if(li4.sTATUS=="1") {
+          setStatus(true, false,true,false);
           setState(() {
+            enableTypeahead = false;
+            enableDropdown = false;
             enableWorkStart=false;
             enableWorkEnd=true;
           });
@@ -427,7 +545,10 @@ else
         li4 = SuccessResponse.fromJson(decoded[0]);
         print(li4.sTATUSMSG);
         if(li4.sTATUS=="1") {
+          setStatus(true, false,true,true);
           setState(() {
+            enableTypeahead = true;
+            enableDropdown = true;
             enableWorkEnd=false;
             enableWorkStart=true;
           });
@@ -586,6 +707,16 @@ else
     return bounds;
   }
 
+
+  static Future<bool> setStatus(tstart, tend,wstart,wend) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('tstart', tstart);
+    await prefs.setBool('tend', tend);
+    await prefs.setBool('wstart', wstart);
+    await prefs.setBool('wend', wstart);
+    return true;
+  }
+
   Completer<GoogleMapController> _controller = Completer();
   var _kGooglePlex;
   Marker marker;
@@ -607,12 +738,17 @@ else
   List<Location> locations;
 
   void initState() {
+// prevstatus();
+
+    enableTypeahead = true;
+    enableDropdown = true;
+
     getlocation().then((value) {
 
       currlat=position.latitude;
 
       currlon=position.longitude;
-      placefromLATLNG();
+      placefromLATLNG().then((value) => CheckValidation());
     });
 //     location.onLocationChanged.listen((locate.LocationData currentLocation) {
 // setState(() {
@@ -723,7 +859,7 @@ myLocationEnabled: true,
                                 child: DropdownButton<String>(
                                   isExpanded: true,
                                   value: dropdownValue1,
-                                  onChanged: (String newValue) {
+                                  onChanged: enableDropdown?(String newValue) {
                                     setState(() {
 
                                       dropdownValue1 = newValue;
@@ -737,7 +873,7 @@ myLocationEnabled: true,
 
 
                                     });
-                                  },
+                                  }:null,
                                   items: stringlist
                                       .map<DropdownMenuItem<String>>((String value) {
                                     return DropdownMenuItem<String>(
@@ -754,7 +890,7 @@ myLocationEnabled: true,
                                   left: 16.0, right: 16.0, top: 16),
                               child: TypeAheadFormField(
                                 textFieldConfiguration: TextFieldConfiguration(
-                                  enabled: true,
+                                  enabled: enableTypeahead,
                                   controller: this._typeAheadController,
                                   // onTap: ()
                                   // {
@@ -982,6 +1118,14 @@ myLocationEnabled: true,
    });
 
   }
+
+  Future<void> prevstatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+     enableStartTravel= !prefs.getBool('tstart');
+    enableEndTravel= !prefs.getBool('tend');
+    enableWorkStart= !prefs.getBool('wstart');
+    enableWorkEnd= !prefs.getBool('wend');
+  }
 }
 class BackendService {
   static Future<List> getSuggestions(String query) async {
@@ -990,10 +1134,10 @@ class BackendService {
       // return ["No details"];
     } else {
       for (int i = 0; i < MapScreenState.li3.details.length; i++)
-        if (MapScreenState.li3.details[i].cardName
+        if (MapScreenState.li3.details[i].cardName.toString()
             .toLowerCase()
             .contains(query.toLowerCase()) ||
-            MapScreenState.li3.details[i].cardName
+            MapScreenState.li3.details[i].cardName.toString()
                 .toLowerCase()
                 .contains(query.toLowerCase()))
           s.add("${MapScreenState.li3.details[i].cardName}");
