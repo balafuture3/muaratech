@@ -430,8 +430,6 @@ else
       print(parsedXml.text);
       if (parsedXml.text != "[]")
       {
-
-
         final decoded = json.decode(parsedXml.text);
         li4 = SuccessResponse.fromJson(decoded[0]);
         print(li4.sTATUSMSG);
