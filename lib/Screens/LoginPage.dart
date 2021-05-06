@@ -291,7 +291,7 @@ class LoginScreenState extends State<LoginScreen> {
               SizedBox(
                 height: height /10,
               ),
-
+Text("Version : V1.0.0")
             ],
           ),
         ),

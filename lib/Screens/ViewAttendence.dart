@@ -597,37 +597,37 @@ class ViewAttendenceState extends State<ViewAttendence> {
               child: DataTable(
                 headingRowColor:
                 MaterialStateColor.resolveWith((states) => String_values.primarycolor),
-                  columnSpacing: width / 20,
+                  columnSpacing: 5,
 
 
                   columns:
 
                   [
 
-                    DataColumn(
-                      label: Center(
-                          child: Wrap(
-                        direction: Axis.vertical, //default
-                        alignment: WrapAlignment.center,
-                        children: [
-                          Text(
-                            "S.No",
-                            softWrap: true,
-
-                            style: TextStyle(fontSize: 12,color: Colors.white),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      )),
-                      numeric: false,
-
-                      // onSort: (columnIndex, ascending) {
-                      //   onSortColum(columnIndex, ascending);
-                      //   setState(() {
-                      //     sort = !sort;
-                      //   });
-                      // }
-                    ),
+                    // DataColumn(
+                    //   label: Center(
+                    //       child: Wrap(
+                    //     direction: Axis.vertical, //default
+                    //     alignment: WrapAlignment.center,
+                    //     children: [
+                    //       Text(
+                    //         "S.No",
+                    //         softWrap: true,
+                    //
+                    //         style: TextStyle(fontSize: 12,color: Colors.white),
+                    //         textAlign: TextAlign.center,
+                    //       ),
+                    //     ],
+                    //   )),
+                    //   numeric: false,
+                    //
+                    //   // onSort: (columnIndex, ascending) {
+                    //   //   onSortColum(columnIndex, ascending);
+                    //   //   setState(() {
+                    //   //     sort = !sort;
+                    //   //   });
+                    //   // }
+                    // ),
                     DataColumn(
                       label: Center(
                           child: Wrap(
@@ -670,13 +670,55 @@ class ViewAttendenceState extends State<ViewAttendence> {
                       //   });
                       // }
                     ),
+
                     DataColumn(
+                      label: Wrap(
+                        direction: Axis.vertical, //default
+                        alignment: WrapAlignment.end,
+                        children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text("Start",
+                              softWrap: true,
+                              style: TextStyle(fontSize: 16,color: Colors.white),
+                              textAlign: TextAlign.end),
+                          Divider(color: Colors.white,
+                            thickness: 5,
+                            height: 5,),
+                          Text("Travel Start           ",
+                              softWrap: true,
+                              style: TextStyle(fontSize: 12,color: Colors.white),
+                              textAlign: TextAlign.end),
+                        ],
+                      ),
+                        ],
+                      ),
+                      numeric: false,
+
+                      // onSort: (columnIndex, ascending) {
+                      //   onSortColum(columnIndex, ascending);
+                      //   setState(() {
+                      //     sort = !sort;
+                      //   });
+                      // }
+                    ),
+                    DataColumn(
+
                       label: Center(
                           child: Wrap(
                         direction: Axis.vertical, //default
                         alignment: WrapAlignment.center,
                         children: [
-                          Text("Travel Start Time",
+                          Text("Time",
+                              softWrap: true,
+                              style: TextStyle(fontSize: 16,color: Colors.white),
+                              textAlign: TextAlign.center),
+                          Divider(color: Colors.white,
+                          thickness: 5,
+                          height: 5,),
+                          Text("Work Start",
                               softWrap: true,
                               style: TextStyle(fontSize: 12,color: Colors.white),
                               textAlign: TextAlign.center),
@@ -692,38 +734,29 @@ class ViewAttendenceState extends State<ViewAttendence> {
                       // }
                     ),
                     DataColumn(
-                      label: Center(
-                          child: Wrap(
+                      label: Wrap(
                         direction: Axis.vertical, //default
-                        alignment: WrapAlignment.center,
+                        alignment: WrapAlignment.end,
                         children: [
-                          Text("Travel End Time",
-                              softWrap: true,
-                              style: TextStyle(fontSize: 12,color: Colors.white),
-                              textAlign: TextAlign.center),
-                        ],
-                      )),
-                      numeric: false,
-
-                      // onSort: (columnIndex, ascending) {
-                      //   onSortColum(columnIndex, ascending);
-                      //   setState(() {
-                      //     sort = !sort;
-                      //   });
-                      // }
-                    ),
-                    DataColumn(
-                      label: Center(
-                          child: Wrap(
-                            direction: Axis.vertical, //default
-                            alignment: WrapAlignment.center,
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text("Work Start in Customer Place Time",
+                              Text("End",
+                                  softWrap: true,
+                                  style: TextStyle(fontSize: 16,color: Colors.white),
+                                  textAlign: TextAlign.end),
+                              Divider(color: Colors.white,
+                                thickness: 5,
+                                height: 5,),
+                              Text("Travel End              ",
                                   softWrap: true,
                                   style: TextStyle(fontSize: 12,color: Colors.white),
-                                  textAlign: TextAlign.center),
+                                  textAlign: TextAlign.end),
                             ],
-                          )),
+                          ),
+                        ],
+                      ),
                       numeric: false,
 
                       // onSort: (columnIndex, ascending) {
@@ -734,12 +767,20 @@ class ViewAttendenceState extends State<ViewAttendence> {
                       // }
                     ),
                     DataColumn(
+
                       label: Center(
                           child: Wrap(
                             direction: Axis.vertical, //default
                             alignment: WrapAlignment.center,
                             children: [
-                              Text("Work End in Customer Place Time",
+                              Text("Time",
+                                  softWrap: true,
+                                  style: TextStyle(fontSize: 16,color: Colors.white),
+                                  textAlign: TextAlign.center),
+                              Divider(color: Colors.white,
+                                thickness: 5,
+                                height: 5,),
+                              Text("Work End   ",
                                   softWrap: true,
                                   style: TextStyle(fontSize: 12,color: Colors.white),
                                   textAlign: TextAlign.center),
@@ -758,18 +799,18 @@ class ViewAttendenceState extends State<ViewAttendence> {
                   rows: [
                     for(int list=0;list<li4.details.length;list++)
             DataRow(cells: [
-                  DataCell(Center(
-                      child: Center(
-                    child: Wrap(
-                        direction: Axis.vertical, //default
-                        alignment: WrapAlignment.center,
-                        children: [
-                          Text(
-                            (list+1).toString(),
-                            textAlign: TextAlign.center,
-                          )
-                        ]),
-                  ))),
+                  // DataCell(Center(
+                  //     child: Center(
+                  //   child: Wrap(
+                  //       direction: Axis.vertical, //default
+                  //       alignment: WrapAlignment.center,
+                  //       children: [
+                  //         Text(
+                  //           (list+1).toString(),
+                  //           textAlign: TextAlign.center,
+                  //         )
+                  //       ]),
+                  // ))),
                   DataCell(Center(
                       child: Center(
                     child: Wrap(
@@ -806,7 +847,7 @@ class ViewAttendenceState extends State<ViewAttendence> {
                         direction: Axis.vertical, //default
                         alignment: WrapAlignment.center,
                         children: [
-                          Text(li4.details[list].tENDTIME.toString(),
+                          Text(li4.details[list].wSTARTTIME.toString(),
                               textAlign: TextAlign.center)
                         ]),
                   ))),
@@ -816,7 +857,7 @@ class ViewAttendenceState extends State<ViewAttendence> {
                         direction: Axis.vertical, //default
                         alignment: WrapAlignment.center,
                         children: [
-                          Text(li4.details[list].wSTARTTIME.toString(),
+                          Text(li4.details[list].tENDTIME.toString(),
                               textAlign: TextAlign.center)
                         ]),
                   ))),
@@ -908,6 +949,8 @@ class ViewAttendenceState extends State<ViewAttendence> {
                   //       ))),
                   //     ]))
               )),
+
+
               SizedBox(
                 height: height / 30,
               ),

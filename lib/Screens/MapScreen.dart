@@ -62,6 +62,8 @@ class MapScreenState extends State<MapScreen> {
 
   bool enableDropdown=true;
 
+  var visibletravel=true;
+
   Future<http.Response> CheckValidation() async {
     setState(() {
       loading = true;
@@ -115,7 +117,7 @@ class MapScreenState extends State<MapScreen> {
            dropdownValue1=li5.tRAVELTYPE;
            _typeAheadController.text=li5.cUSTOMERNAME;
            cardcode=li5.cUSTOMERCODE;
-           if(li5.wSTARTCUSPLACE == "Y" && li5.wENDCUSPLACE == "N") {
+           if(li5.tRAVELSTART == "Y" && li5.wENDCUSPLACE == "N") {
              enableTypeahead = false;
              enableDropdown = false;
            }
@@ -328,6 +330,8 @@ else
         print(li4.sTATUSMSG);
         if(li4.sTATUS=="1") {
           setState(() {
+            dropdownValue1="Select Type";
+            _typeAheadController.text="";
             setStatus(false, false,false,false);
             enableStartTravel=true;
             enableWorkStart=true;
@@ -862,10 +866,27 @@ myLocationEnabled: true,
 
                                       dropdownValue1 = newValue;
                                       _typeAheadController.text="";
-                                      if(dropdownValue1=="Office")
-                                        customerListorOfficeList(1);
-                                      else if(dropdownValue1=="Customer")
+                                      if(dropdownValue1=="Office") {
+                                        customerListorOfficeList(1).then((value) {
+                                          for(int i=0;i<li3.details.length;i++)
+                                            if(li3.details[i].cardName.toLowerCase()==placemarks[0].locality.toLowerCase())
+                                            {
+                                              _typeAheadController.text =
+                                                  li3.details[i].cardName;
+
+                                              cardcode = li3.details[i].cardCode;
+                                              enableStartTravel=false;
+                                              enableEndTravel=false;
+                                              enableWorkStart=true;
+                                              enableWorkEnd=true;
+                                              visibletravel=false;
+                                            }
+                                        });
+                                      }
+                                      else if(dropdownValue1=="Customer") {
                                         customerListorOfficeList(2);
+                                        visibletravel=true;
+                                      }
                                       else
                                         Fluttertoast.showToast(msg: "Please Choose Office or Customer");
 
@@ -924,15 +945,39 @@ myLocationEnabled: true,
                                   return suggestionsBox;
                                 },
                                 onSuggestionSelected: (suggestion) {
-                                  setState(() {
+                                  int cnt=0;
                                     // dropdownValue1 = " Select OBD Number ";
-                                  });
+
 
                                   // postRequest(suggestion);
                                   for (int i = 0; i < li3.details.length; i++) {
                                     print(li3.details[i].cardName);
                                     if ("${li3.details[i].cardName}" == suggestion) {
+
                                       cardcode = li3.details[i].cardCode;
+
+                                      if(dropdownValue1=="Office")
+                                      {
+
+cnt=0;
+
+                                            if(li3.details[i].cardName.toLowerCase()==placemarks[0].locality.toLowerCase())
+                                            {
+                                              _typeAheadController.text =
+                                                  li3.details[i].cardName;
+cnt++;
+setState(() {
+
+  enableWorkStart=true;
+  enableWorkEnd=true;
+  visibletravel=false;
+});
+                                              cardcode = li3.details[i].cardCode;
+
+                                            }
+
+
+                                      }
 
                                       // CustomerCodeController.text=li3.details[i].customer;
                                       //
@@ -941,6 +986,21 @@ myLocationEnabled: true,
 
                                     }
                                   }
+if(dropdownValue1=="Office")
+  if(cnt==0) {
+    setState(() {
+
+      enableStartTravel=true;
+      enableEndTravel=true;
+      enableWorkStart=true;
+      enableWorkEnd=true;
+      visibletravel = true;
+    });
+
+    print("show");
+  }
+                                  print(cnt);
+                                  CheckValidation();
                                   this._typeAheadController.text = suggestion;
                                 },
                                 validator: (value) {
@@ -953,42 +1013,45 @@ myLocationEnabled: true,
                               ),
                             ),
                             Divider(),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                RaisedButton(onPressed: enableStartTravel?(){
-                                  if(dropdownValue1!="Select Type"&&_typeAheadController.text!=""&&_typeAheadController.text!="Select Customer"&&_typeAheadController.text!="Select Office")
+                            Visibility(
+                              visible: visibletravel,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                children: [
+                                  RaisedButton(onPressed: enableStartTravel?(){
+                                    if(dropdownValue1!="Select Type"&&_typeAheadController.text!=""&&_typeAheadController.text!="Select Customer"&&_typeAheadController.text!="Select Office")
 
-                                    getlocation().then((value) {
-                                    placefromLATLNG();
-                                  }).then((value) => StartTravel());
-                                  else
-                                    Fluttertoast.showToast(msg: "Please Select Type and Customer or Office");
-                                }:null,child: Text("Start Travel",style: TextStyle(color: Colors.white)),
-                                  elevation: 5,
-                                  color: String_values.primarycolor,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius:
-                                    BorderRadius.circular(25.0),
+                                      getlocation().then((value) {
+                                      placefromLATLNG();
+                                    }).then((value) => StartTravel());
+                                    else
+                                      Fluttertoast.showToast(msg: "Please Select Type and Customer or Office");
+                                  }:null,child: Text("Start Travel",style: TextStyle(color: Colors.white)),
+                                    elevation: 5,
+                                    color: String_values.primarycolor,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius:
+                                      BorderRadius.circular(25.0),
+                                    ),
                                   ),
-                                ),
-                                RaisedButton(onPressed: enableEndTravel?(){
-                                  if(dropdownValue1!="Select Type"&&_typeAheadController.text!=""&&_typeAheadController.text!="Select Customer"&&_typeAheadController.text!="Select Office")
+                                  RaisedButton(onPressed: enableEndTravel?(){
+                                    if(dropdownValue1!="Select Type"&&_typeAheadController.text!=""&&_typeAheadController.text!="Select Customer"&&_typeAheadController.text!="Select Office")
 
-                                    getlocation().then((value) {
-                                    placefromLATLNG();
-                                  }).then((value) => EndTravel());
-                                  else
-                                    Fluttertoast.showToast(msg: "Please Select Type and Customer or Office");
-                                }:null,child: Text("End Travel",style: TextStyle(color: Colors.white)),
-                                  elevation: 5,
-                                  color: String_values.primarycolor,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius:
-                                    BorderRadius.circular(25.0),
-                                  ),),
+                                      getlocation().then((value) {
+                                      placefromLATLNG();
+                                    }).then((value) => EndTravel());
+                                    else
+                                      Fluttertoast.showToast(msg: "Please Select Type and Customer or Office");
+                                  }:null,child: Text("End Travel",style: TextStyle(color: Colors.white)),
+                                    elevation: 5,
+                                    color: String_values.primarycolor,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius:
+                                      BorderRadius.circular(25.0),
+                                    ),),
 
-                              ],
+                                ],
+                              ),
                             ),
 
                             Row(
