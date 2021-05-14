@@ -1,28 +1,26 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
+
+import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:geocoding_platform_interface/src/models/placemark.dart';
-import 'package:http/http.dart' as http;
-import 'package:flutter/material.dart';
 import 'package:geocoding_platform_interface/src/models/location.dart';
+import 'package:geocoding_platform_interface/src/models/placemark.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
+import 'package:location/location.dart' as locate;
 import 'package:muratech/Models/CheckValidationModel.dart';
 import 'package:muratech/Models/CustomerOfficeModel.dart';
 import 'package:muratech/Models/SuccessModel.dart';
 import 'package:muratech/Screens/LoginPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:xml/xml.dart' as xml;
-import '../String_Values.dart';
-import 'package:location/location.dart' as locate;
 
+import '../String_Values.dart';
 
 class MapScreen extends StatefulWidget {
   MapScreen({Key key, this.username});
@@ -38,17 +36,17 @@ class MapScreenState extends State<MapScreen> {
 
   static CustomerOfficeList li3;
 
-  var enableStartTravel=true;
+  var enableStartTravel = true;
 
   String cardcode;
 
   SuccessResponse li4;
 
-  var enableEndTravel=true;
+  var enableEndTravel = true;
 
-  var enableWorkStart=true;
+  var enableWorkStart = true;
 
-  var enableWorkEnd=true;
+  var enableWorkEnd = true;
 
   Timer timer;
 
@@ -58,11 +56,11 @@ class MapScreenState extends State<MapScreen> {
 
   CheckValidationModel li5;
 
-  bool enableTypeahead= true;
+  bool enableTypeahead = true;
 
-  bool enableDropdown=true;
+  bool enableDropdown = true;
 
-  var visibletravel=true;
+  var visibletravel = true;
 
   Future<http.Response> CheckValidation() async {
     setState(() {
@@ -92,55 +90,52 @@ class MapScreenState extends State<MapScreen> {
         },
         body: envelope);
     if (response.statusCode == 200) {
-      setStatus(true, false,false,false);
+      setStatus(true, false, false, false);
       setState(() {
         loading = false;
       });
 
       xml.XmlDocument parsedXml = xml.XmlDocument.parse(response.body);
       print(parsedXml.text);
-      if (parsedXml.text != "[]")
-      {
-
-
+      if (parsedXml.text != "[]") {
         final decoded = json.decode(parsedXml.text);
         li5 = CheckValidationModel.fromJson(decoded[0]);
         print(li5.cUSNAME1);
         setState(() {
-         if (li5.wORKSTART=="Y"&&li5.wORKEND=="Y"&&li5.sTOPTRAVEL=="Y"&&li5.sTARTTRAVEL=="Y") {
+          if (li5.wORKSTART == "Y" &&
+              li5.wORKEND == "Y" &&
+              li5.sTOPTRAVEL == "Y" &&
+              li5.sTARTTRAVEL == "Y") {
+          } else {
+            dropdownValue1 = li5.tYPENAME;
+            _typeAheadController.text = li5.cUSNAME;
+            cardcode = li5.cUSCODE;
+            if (li5.sTARTTRAVEL == "Y" && li5.wORKEND == "N") {
+              enableTypeahead = false;
+              enableDropdown = false;
+            } else {
+              enableTypeahead = true;
+              enableDropdown = true;
+            }
+            li5.wORKSTART == "Y" ? enableWorkStart = false : true;
+            if (li5.wORKEND == "Y") {
+              enableWorkEnd = false;
+              enableWorkStart = true;
+            } else
+              enableWorkEnd = true;
+            li5.sTARTTRAVEL == "Y" ? enableStartTravel = false : true;
+            li5.sTOPTRAVEL == "Y" ? enableEndTravel = false : true;
 
-         }
-         else {
-           dropdownValue1=li5.tYPENAME;
-           _typeAheadController.text=li5.cUSNAME;
-           cardcode=li5.cUSCODE;
-           if(li5.sTARTTRAVEL == "Y" && li5.wORKEND == "N") {
-             enableTypeahead = false;
-             enableDropdown = false;
-           }
-           else
-           {
-             enableTypeahead = true;
-             enableDropdown = true;
-           }
-           li5.wORKSTART == "Y" ? enableWorkStart = false : true;
-           if(li5.wORKEND == "Y") { enableWorkEnd = false;enableWorkStart = true ;}else enableWorkEnd = true;
-           li5.sTARTTRAVEL == "Y" ? enableStartTravel = false : true;
-           li5.sTOPTRAVEL == "Y" ? enableEndTravel = false : true;
-
-           if(li5.tYPENAME=="Office")
-             {
-               if(li5.cUSNAME.toLowerCase()==placemarks[0].locality.toLowerCase())
-                 {
-                   setState(() {
-
-                     visibletravel=false;
-                   });
-                 }
-             }
-         }
+            if (li5.tYPENAME == "Office") {
+              if (li5.cUSNAME.toLowerCase() ==
+                  placemarks[0].locality.toLowerCase()) {
+                setState(() {
+                  visibletravel = false;
+                });
+              }
+            }
+          }
         });
-
 
         // Navigator.pushReplacement(
         //   context,
@@ -149,15 +144,7 @@ class MapScreenState extends State<MapScreen> {
         //           Dashboard()),
         // );
 
-      } else
-        Fluttertoast.showToast(
-            msg: "Please check your login details,No users found",
-            toastLength: Toast.LENGTH_LONG,
-            gravity: ToastGravity.SNACKBAR,
-            timeInSecForIosWeb: 1,
-            backgroundColor: String_values.primarycolor,
-            textColor: Colors.white,
-            fontSize: 16.0);
+      }
     } else {
       Fluttertoast.showToast(
           msg: "Http error!, Response code ${response.statusCode}",
@@ -191,17 +178,17 @@ class MapScreenState extends State<MapScreen> {
       <CusCode>${cardcode}</CusCode>
       <CusName>${_typeAheadController.text}</CusName>
       <StartTravel>Y</StartTravel>
-      <StartLatLang></StartLatLang>
-      <StartAddress></StartAddress>
+      <StartLatLang>${currlat.toString() + ',' + currlon.toString()}</StartLatLang>
+      <StartAddress>${AddressController.text}</StartAddress>
       <Remarks>test</Remarks>
-      <UserID>>${LoginScreenState.empID}</UserID>
+      <UserID>${LoginScreenState.empID}</UserID>
     </IN_MOB_STARTATTENDANCE>
   </soap12:Body>
 </soap12:Envelope>''';
     print(envelope);
     var url =
         'http://15.206.119.30:2021/Muratech/Service.asmx?op=IN_MOB_STARTATTENDANCE';
-    http://15.206.119.30:2021/Muratech/Service.asmx?op=IN_MOB_STARTATTENDANCE
+    http: //15.206.119.30:2021/Muratech/Service.asmx?op=IN_MOB_STARTATTENDANCE
     print(url);
     // Map data = {
     //   "username": EmailController.text,
@@ -229,47 +216,43 @@ class MapScreenState extends State<MapScreen> {
 
     var response = await http.post(url,
         headers: {
-          "Content-Type": "text/xml; charset=utf-8",
+          "Content-Type": "application/soap+xml; charset=utf-8",
         },
         body: envelope);
     if (response.statusCode == 200) {
-      setStatus(true, false,false,false);
+      setStatus(true, false, false, false);
       setState(() {
         loading = false;
       });
 
       xml.XmlDocument parsedXml = xml.XmlDocument.parse(response.body);
       print(parsedXml.text);
-      if (parsedXml.text != "[]")
-      {
-
-
+      if (parsedXml.text != "[]") {
         final decoded = json.decode(parsedXml.text);
         li4 = SuccessResponse.fromJson(decoded[0]);
         print(li4.sTATUSMSG);
-if(li4.sTATUS=="1") {
-  setState(() {
-    enableStartTravel=false;
-  });
+        if (li4.sTATUS == "1") {
+          setState(() {
+            enableStartTravel = false;
+          });
 
-  Fluttertoast.showToast(
-      msg: li4.sTATUSMSG,
-      toastLength: Toast.LENGTH_LONG,
-      gravity: ToastGravity.SNACKBAR,
-      timeInSecForIosWeb: 1,
-      backgroundColor: String_values.primarycolor,
-      textColor: Colors.white,
-      fontSize: 16.0);
-}
-else
-  Fluttertoast.showToast(
-      msg: li4.sTATUSMSG,
-      toastLength: Toast.LENGTH_LONG,
-      gravity: ToastGravity.SNACKBAR,
-      timeInSecForIosWeb: 1,
-      backgroundColor: String_values.primarycolor,
-      textColor: Colors.white,
-      fontSize: 16.0);
+          Fluttertoast.showToast(
+              msg: li4.sTATUSMSG,
+              toastLength: Toast.LENGTH_LONG,
+              gravity: ToastGravity.SNACKBAR,
+              timeInSecForIosWeb: 1,
+              backgroundColor: String_values.primarycolor,
+              textColor: Colors.white,
+              fontSize: 16.0);
+        } else
+          Fluttertoast.showToast(
+              msg: li4.sTATUSMSG,
+              toastLength: Toast.LENGTH_LONG,
+              gravity: ToastGravity.SNACKBAR,
+              timeInSecForIosWeb: 1,
+              backgroundColor: String_values.primarycolor,
+              textColor: Colors.white,
+              fontSize: 16.0);
         // Navigator.pushReplacement(
         //   context,
         //   MaterialPageRoute(
@@ -304,6 +287,7 @@ else
     print("response: ${response.body}");
     return response;
   }
+
   Future<http.Response> EndTravel() async {
     setState(() {
       loading = true;
@@ -317,10 +301,10 @@ else
       <CusCode>${cardcode}</CusCode>
       <CusName>${_typeAheadController.text}</CusName>
       <StartTravel>Y</StartTravel>
-      <StartLatLang>${currlat.toString()+','+currlon.toString()}</StartLatLang>
+      <StartLatLang>${currlat.toString() + ',' + currlon.toString()}</StartLatLang>
       <StartAddress>${AddressController.text}</StartAddress>
       <Remarks>test</Remarks>
-      <UserID>>${LoginScreenState.empID}</UserID>
+      <UserID>${LoginScreenState.empID}</UserID>
     </IN_MOB_STOPATTENDANCE>
   </soap12:Body>
 </soap12:Envelope>''';
@@ -333,10 +317,10 @@ else
     // };
 //    print("data: ${data}");
 
-print(url);
+    print(url);
     var response = await http.post(url,
         headers: {
-          "Content-Type": "text/xml; charset=utf-8",
+          "Content-Type": "application/soap+xml; charset=utf-8",
         },
         body: envelope);
     if (response.statusCode == 200) {
@@ -346,21 +330,18 @@ print(url);
 
       xml.XmlDocument parsedXml = xml.XmlDocument.parse(response.body);
       print(parsedXml.text);
-      if (parsedXml.text != "[]")
-      {
-
-
+      if (parsedXml.text != "[]") {
         final decoded = json.decode(parsedXml.text);
         li4 = SuccessResponse.fromJson(decoded[0]);
         print(li4.sTATUSMSG);
-        if(li4.sTATUS=="1") {
+        if (li4.sTATUS == "1") {
           setState(() {
-            dropdownValue1="Select Type";
-            _typeAheadController.text="";
-            setStatus(false, false,false,false);
-            enableStartTravel=true;
-            enableWorkStart=true;
-            enableWorkEnd=true;
+            dropdownValue1 = "Select Type";
+            _typeAheadController.text = "";
+            setStatus(false, false, false, false);
+            enableStartTravel = true;
+            enableWorkStart = true;
+            enableWorkEnd = true;
           });
 
           Fluttertoast.showToast(
@@ -371,8 +352,7 @@ print(url);
               backgroundColor: String_values.primarycolor,
               textColor: Colors.white,
               fontSize: 16.0);
-        }
-        else
+        } else
           Fluttertoast.showToast(
               msg: li4.sTATUSMSG,
               toastLength: Toast.LENGTH_LONG,
@@ -415,6 +395,7 @@ print(url);
     print("response: ${response.body}");
     return response;
   }
+
   Future<http.Response> WorkStart() async {
     setState(() {
       loading = true;
@@ -428,13 +409,14 @@ print(url);
       <CusCode>${cardcode}</CusCode>
       <CusName>${_typeAheadController.text}</CusName>
       <StartTravel>Y</StartTravel>
-      <StartLatLang>${currlat.toString()+','+currlon.toString()}</StartLatLang>
+      <StartLatLang>${currlat.toString() + ',' + currlon.toString()}</StartLatLang>
       <StartAddress>${AddressController.text}</StartAddress>
       <Remarks>test</Remarks>
-      <UserID>>${LoginScreenState.empID}</UserID>
+      <UserID>${LoginScreenState.empID}</UserID>
     </IN_MOB_WORKSTRATATTENDANCE>
   </soap12:Body>
 </soap12:Envelope>''';
+    print(envelope);
     print(envelope);
     var url =
         'http://15.206.119.30:2021/Muratech/Service.asmx?op=IN_MOB_WORKSTRATATTENDANCE';
@@ -447,7 +429,7 @@ print(url);
     print(url);
     var response = await http.post(url,
         headers: {
-          "Content-Type": "text/xml; charset=utf-8",
+          "Content-Type": "application/soap+xml; charset=utf-8",
         },
         body: envelope);
     if (response.statusCode == 200) {
@@ -457,18 +439,17 @@ print(url);
 
       xml.XmlDocument parsedXml = xml.XmlDocument.parse(response.body);
       print(parsedXml.text);
-      if (parsedXml.text != "[]")
-      {
+      if (parsedXml.text != "[]") {
         final decoded = json.decode(parsedXml.text);
         li4 = SuccessResponse.fromJson(decoded[0]);
         print(li4.sTATUSMSG);
-        if(li4.sTATUS=="1") {
-          setStatus(true, false,true,false);
+        if (li4.sTATUS == "1") {
+          setStatus(true, false, true, false);
           setState(() {
             enableTypeahead = false;
             enableDropdown = false;
-            enableWorkStart=false;
-            enableWorkEnd=true;
+            enableWorkStart = false;
+            enableWorkEnd = true;
           });
 
           Fluttertoast.showToast(
@@ -479,8 +460,7 @@ print(url);
               backgroundColor: String_values.primarycolor,
               textColor: Colors.white,
               fontSize: 16.0);
-        }
-        else
+        } else
           Fluttertoast.showToast(
               msg: li4.sTATUSMSG,
               toastLength: Toast.LENGTH_LONG,
@@ -523,6 +503,7 @@ print(url);
     print("response: ${response.body}");
     return response;
   }
+
   Future<http.Response> WorkEnd() async {
     setState(() {
       loading = true;
@@ -536,10 +517,10 @@ print(url);
       <CusCode>${cardcode}</CusCode>
       <CusName>${_typeAheadController.text}</CusName>
       <StartTravel>Y</StartTravel>
-      <StartLatLang>${currlat.toString()+','+currlon.toString()}</StartLatLang>
+      <StartLatLang>${currlat.toString() + ',' + currlon.toString()}</StartLatLang>
       <StartAddress>${AddressController.text}</StartAddress>
       <Remarks>test</Remarks>
-      <UserID>>${LoginScreenState.empID}</UserID>
+      <UserID>${LoginScreenState.empID}</UserID>
     </IN_MOB_WORKENDATTENDANCE>
   </soap12:Body>
 </soap12:Envelope>
@@ -557,7 +538,7 @@ print(url);
 
     var response = await http.post(url,
         headers: {
-          "Content-Type": "text/xml; charset=utf-8",
+          "Content-Type": "application/soap+xml; charset=utf-8",
         },
         body: envelope);
     if (response.statusCode == 200) {
@@ -567,20 +548,17 @@ print(url);
 
       xml.XmlDocument parsedXml = xml.XmlDocument.parse(response.body);
       print(parsedXml.text);
-      if (parsedXml.text != "[]")
-      {
-
-
+      if (parsedXml.text != "[]") {
         final decoded = json.decode(parsedXml.text);
         li4 = SuccessResponse.fromJson(decoded[0]);
         print(li4.sTATUSMSG);
-        if(li4.sTATUS=="1") {
-          setStatus(true, false,true,true);
+        if (li4.sTATUS == "1") {
+          setStatus(true, false, true, true);
           setState(() {
             enableTypeahead = true;
             enableDropdown = true;
-            enableWorkEnd=false;
-            enableWorkStart=true;
+            enableWorkEnd = false;
+            enableWorkStart = true;
           });
 
           Fluttertoast.showToast(
@@ -591,8 +569,7 @@ print(url);
               backgroundColor: String_values.primarycolor,
               textColor: Colors.white,
               fontSize: 16.0);
-        }
-        else
+        } else
           Fluttertoast.showToast(
               msg: li4.sTATUSMSG,
               toastLength: Toast.LENGTH_LONG,
@@ -635,7 +612,6 @@ print(url);
     print("response: ${response.body}");
     return response;
   }
-
 
   Future<http.Response> customerListorOfficeList(formid) async {
     setState(() {
@@ -737,8 +713,7 @@ print(url);
     return bounds;
   }
 
-
-  static Future<bool> setStatus(tstart, tend,wstart,wend) async {
+  static Future<bool> setStatus(tstart, tend, wstart, wend) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool('tstart', tstart);
     await prefs.setBool('tend', tend);
@@ -760,7 +735,6 @@ print(url);
   var loading = false;
   bool textcheck = false;
 
-
   BitmapDescriptor pinLocationIcon;
   BitmapDescriptor pinLocationIcon1;
   List<Placemark> placemarks;
@@ -774,10 +748,9 @@ print(url);
     enableDropdown = true;
 
     getlocation().then((value) {
+      currlat = position.latitude;
 
-      currlat=position.latitude;
-
-      currlon=position.longitude;
+      currlon = position.longitude;
       placefromLATLNG().then((value) => CheckValidation());
     });
 //     location.onLocationChanged.listen((locate.LocationData currentLocation) {
@@ -820,21 +793,18 @@ print(url);
     }
 
     return Scaffold(
-        body: loading
-            ? Center(child: CircularProgressIndicator())
-            : SafeArea(
+      body: loading
+          ? Center(child: CircularProgressIndicator())
+          : SafeArea(
               child: Container(
-              child: Stack(
+                  child: Stack(
                 // alignment: Alignment.bottomCenter,
                 children: [
                   GoogleMap(
-                    padding: EdgeInsets.only(top:height/2),
-
-myLocationEnabled: true,
-
+                    padding: EdgeInsets.only(top: height / 2),
+                    myLocationEnabled: true,
                     myLocationButtonEnabled: true,
                     mapType: MapType.normal,
-
                     initialCameraPosition: _kGooglePlex,
                     onMapCreated: (GoogleMapController controller) {
                       _controller.complete(controller);
@@ -842,302 +812,379 @@ myLocationEnabled: true,
                     markers: markers,
                   ),
                   Container(
-
                     color: Colors.white,
-                    child: ExpansionTile(title: Text("Attendence"),
-                    initiallyExpanded: true,
-                    children: [
-                      Container(
-                        color: Colors.white,
-
-                        child: Column(
-                          children: [
-
-                            Padding(
-                              padding: const EdgeInsets.only(left:16,right:16,bottom: 16),
-                              child: Row(
-                                children: [
-                                  Expanded(flex:2,child: Icon(Icons.map_sharp,color: String_values.primarycolor,size: height/10,)),
-                                  Expanded(flex:4,child: TextField(
-                                    controller: AddressController,
-                                    enabled: false,
-                                    minLines: 2,
-                                    maxLines: 25,
-                                    style: TextStyle(fontSize: 12),
-                                    decoration: InputDecoration(
-
-                                      labelText: "Your Address",
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(5.0),
-                                      ),
-
-                                    ),
-
-                                  ))
-
-                                ],
-                              ),
-                            ),
-                            Container(
-                              height: 50,
-                              margin: const EdgeInsets.only(left: 16.0, right: 16.0),
-                              padding: const EdgeInsets.only(left:24,right: 10,top: 10,bottom: 10),
-                              decoration: new BoxDecoration(
-                                  borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                                  border: new Border.all(color: Colors.black38)),
-                              child: DropdownButtonHideUnderline(
-                                child: DropdownButton<String>(
-                                  isExpanded: true,
-                                  value: dropdownValue1,
-                                  onChanged: enableDropdown?(String newValue) {
-                                    setState(() {
-
-                                      dropdownValue1 = newValue;
-                                      _typeAheadController.text="";
-                                      if(dropdownValue1=="Office") {
-                                        customerListorOfficeList(1).then((value) {
-                                          for(int i=0;i<li3.details.length;i++)
-                                            if(li3.details[i].cardName.toLowerCase()==placemarks[0].locality.toLowerCase())
-                                            {
-                                              _typeAheadController.text =
-                                                  li3.details[i].cardName;
-
-                                              cardcode = li3.details[i].cardCode;
-                                              enableStartTravel=false;
-                                              enableEndTravel=false;
-                                              enableWorkStart=true;
-                                              enableWorkEnd=true;
-                                              visibletravel=false;
-                                            }
-                                        });
-                                      }
-                                      else if(dropdownValue1=="Customer") {
-                                        customerListorOfficeList(2);
-                                        visibletravel=true;
-                                      }
-                                      else
-                                        Fluttertoast.showToast(msg: "Please Choose Office or Customer");
-
-
-                                    });
-                                  }:null,
-                                  items: stringlist
-                                      .map<DropdownMenuItem<String>>((String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(value),
-                                    );
-                                  }).toList(),
+                    child: ExpansionTile(
+                      title: Text("Attendence"),
+                      initiallyExpanded: true,
+                      children: [
+                        Container(
+                          color: Colors.white,
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 16, right: 16, bottom: 16),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                        flex: 2,
+                                        child: Icon(
+                                          Icons.map_sharp,
+                                          color: String_values.primarycolor,
+                                          size: height / 10,
+                                        )),
+                                    Expanded(
+                                        flex: 4,
+                                        child: TextField(
+                                          controller: AddressController,
+                                          enabled: false,
+                                          minLines: 2,
+                                          maxLines: 25,
+                                          style: TextStyle(fontSize: 12),
+                                          decoration: InputDecoration(
+                                            labelText: "Your Address",
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(5.0),
+                                            ),
+                                          ),
+                                        ))
+                                  ],
                                 ),
                               ),
-                            ),
-                            Container(
-                              height: 50,
-                              margin: const EdgeInsets.only(
-                                  left: 16.0, right: 16.0, top: 16),
-                              child: TypeAheadFormField(
-                                textFieldConfiguration: TextFieldConfiguration(
-                                  enabled: enableTypeahead,
-                                  controller: this._typeAheadController,
-                                  // onTap: ()
-                                  // {
-                                  //   Navigator.push(
-                                  //       context,
-                                  //       MaterialPageRoute(
-                                  //           builder: (context) =>
-                                  //               Category(userid:HomeState.userid,mapselection: true)));
-                                  // },
-                                  keyboardType: TextInputType.text,
-                                  decoration: InputDecoration(
-                                    prefixIcon: Icon(Icons.search),
-                                    labelText: dropdownValue1=="Office"?'Choose Office':dropdownValue1=="Customer"?'Choose Customer':"",
-                                    hintStyle: TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 16.0,
+                              Container(
+                                height: 50,
+                                margin: const EdgeInsets.only(
+                                    left: 16.0, right: 16.0),
+                                padding: const EdgeInsets.only(
+                                    left: 24, right: 10, top: 10, bottom: 10),
+                                decoration: new BoxDecoration(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(25.0)),
+                                    border:
+                                        new Border.all(color: Colors.black38)),
+                                child: DropdownButtonHideUnderline(
+                                  child: DropdownButton<String>(
+                                    isExpanded: true,
+                                    value: dropdownValue1,
+                                    onChanged:
+                                        // enableDropdown?
+                                        (String newValue) {
+                                      setState(() {
+                                        dropdownValue1 = newValue;
+                                        _typeAheadController.text = "";
+                                        if (dropdownValue1 == "Office") {
+                                          customerListorOfficeList(1)
+                                              .then((value) {
+                                            for (int i = 0;
+                                                i < li3.details.length;
+                                                i++)
+                                              if (li3.details[i].cardName
+                                                      .toLowerCase() ==
+                                                  placemarks[0]
+                                                      .locality
+                                                      .toLowerCase()) {
+                                                _typeAheadController.text =
+                                                    li3.details[i].cardName;
+
+                                                cardcode =
+                                                    li3.details[i].cardCode;
+                                                enableStartTravel = false;
+                                                enableEndTravel = false;
+                                                enableWorkStart = true;
+                                                enableWorkEnd = true;
+                                                visibletravel = false;
+                                              }
+                                          });
+                                        } else if (dropdownValue1 ==
+                                            "Customer") {
+                                          customerListorOfficeList(2);
+                                          visibletravel = true;
+                                        } else
+                                          Fluttertoast.showToast(
+                                              msg:
+                                                  "Please Choose Office or Customer");
+                                      });
+                                    }
+                                    // : null
+                                    ,
+                                    items: stringlist
+                                        .map<DropdownMenuItem<String>>(
+                                            (String value) {
+                                      return DropdownMenuItem<String>(
+                                        value: value,
+                                        child: Text(value),
+                                      );
+                                    }).toList(),
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                height: 50,
+                                margin: const EdgeInsets.only(
+                                    left: 16.0, right: 16.0, top: 16),
+                                child: TypeAheadFormField(
+                                  textFieldConfiguration:
+                                      TextFieldConfiguration(
+                                    // enabled: enableTypeahead,
+                                    controller: this._typeAheadController,
+                                    // onTap: ()
+                                    // {
+                                    //   Navigator.push(
+                                    //       context,
+                                    //       MaterialPageRoute(
+                                    //           builder: (context) =>
+                                    //               Category(userid:HomeState.userid,mapselection: true)));
+                                    // },
+                                    keyboardType: TextInputType.text,
+                                    decoration: InputDecoration(
+                                      prefixIcon: Icon(Icons.search),
+                                      labelText: dropdownValue1 == "Office"
+                                          ? 'Choose Office'
+                                          : dropdownValue1 == "Customer"
+                                              ? 'Choose Customer'
+                                              : "",
+                                      hintStyle: TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: 16.0,
+                                      ),
+                                      border: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(25.0),
+                                      ),
                                     ),
-                                    border: OutlineInputBorder(
+                                  ),
+                                  suggestionsCallback: (pattern) {
+                                    return BackendService.getSuggestions(
+                                        pattern);
+                                  },
+                                  itemBuilder: (context, suggestion) {
+                                    return ListTile(
+                                      title: Text(suggestion),
+                                    );
+                                  },
+                                  transitionBuilder:
+                                      (context, suggestionsBox, controller) {
+                                    return suggestionsBox;
+                                  },
+                                  onSuggestionSelected: (suggestion) {
+                                    int cnt = 0;
+                                    // dropdownValue1 = " Select OBD Number ";
+
+                                    // postRequest(suggestion);
+                                    for (int i = 0;
+                                        i < li3.details.length;
+                                        i++) {
+                                      print(li3.details[i].cardName);
+                                      if ("${li3.details[i].cardName}" ==
+                                          suggestion) {
+                                        cardcode = li3.details[i].cardCode;
+
+                                        if (dropdownValue1 == "Office") {
+                                          cnt = 0;
+
+                                          if (li3.details[i].cardName
+                                                  .toLowerCase() ==
+                                              placemarks[0]
+                                                  .locality
+                                                  .toLowerCase()) {
+                                            _typeAheadController.text =
+                                                li3.details[i].cardName;
+                                            cnt++;
+                                            setState(() {
+                                              enableWorkStart = true;
+                                              enableWorkEnd = true;
+                                              visibletravel = false;
+                                            });
+                                            cardcode = li3.details[i].cardCode;
+                                          }
+                                        }
+
+                                        // CustomerCodeController.text=li3.details[i].customer;
+                                        //
+                                        // dropdowncall(li3.details[i].customer);
+                                        // OutboundController.text=li3.details[i].delivery;
+
+                                      }
+                                    }
+                                    if (dropdownValue1 == "Office") if (cnt ==
+                                        0) {
+                                      setState(() {
+                                        enableStartTravel = true;
+                                        enableEndTravel = true;
+                                        enableWorkStart = true;
+                                        enableWorkEnd = true;
+                                        visibletravel = true;
+                                      });
+
+                                      print("show");
+                                    }
+                                    print(cnt);
+                                    CheckValidation();
+                                    this._typeAheadController.text = suggestion;
+                                  },
+                                  validator: (value) {
+                                    if (value.isEmpty) {
+                                      return 'Please select a city';
+                                    } else
+                                      return 'nothing';
+                                  },
+                                  // onSaved: (value) => this._selectedCity = value,
+                                ),
+                              ),
+                              Divider(),
+                              Visibility(
+                                visible: visibletravel,
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                    RaisedButton(
+                                      onPressed: enableStartTravel
+                                          ? () {
+                                              if (dropdownValue1 != "Select Type" &&
+                                                  _typeAheadController.text !=
+                                                      "" &&
+                                                  _typeAheadController.text !=
+                                                      "Select Customer" &&
+                                                  _typeAheadController.text !=
+                                                      "Select Office")
+                                                getlocation().then((value) {
+                                                  placefromLATLNG();
+                                                }).then(
+                                                    (value) => StartTravel());
+                                              else
+                                                Fluttertoast.showToast(
+                                                    msg:
+                                                        "Please Select Type and Customer or Office");
+                                            }
+                                          : null,
+                                      child: Text("Start Travel",
+                                          style:
+                                              TextStyle(color: Colors.white)),
+                                      elevation: 5,
+                                      color: String_values.primarycolor,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(25.0),
+                                      ),
+                                    ),
+                                    RaisedButton(
+                                      onPressed: enableEndTravel
+                                          ? () {
+                                              if (dropdownValue1 != "Select Type" &&
+                                                  _typeAheadController.text !=
+                                                      "" &&
+                                                  _typeAheadController.text !=
+                                                      "Select Customer" &&
+                                                  _typeAheadController.text !=
+                                                      "Select Office")
+                                                getlocation().then((value) {
+                                                  placefromLATLNG();
+                                                }).then((value) => EndTravel());
+                                              else
+                                                Fluttertoast.showToast(
+                                                    msg:
+                                                        "Please Select Type and Customer or Office");
+                                            }
+                                          : null,
+                                      child: Text("End Travel",
+                                          style:
+                                              TextStyle(color: Colors.white)),
+                                      elevation: 5,
+                                      color: String_values.primarycolor,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(25.0),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  RaisedButton(
+                                    color: String_values.primarycolor,
+                                    onPressed: enableWorkStart
+                                        ? () {
+                                            if (dropdownValue1 != "Select Type" &&
+                                                _typeAheadController.text !=
+                                                    "" &&
+                                                _typeAheadController.text !=
+                                                    "Select Customer" &&
+                                                _typeAheadController.text !=
+                                                    "Select Office")
+                                              getlocation().then((value) {
+                                                placefromLATLNG();
+                                              }).then((value) => WorkStart());
+                                            else
+                                              Fluttertoast.showToast(
+                                                  msg:
+                                                      "Please Select Type and Customer or Office");
+                                          }
+                                        : null,
+                                    child: Text(
+                                      "Work Start",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    elevation: 5,
+                                    shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(25.0),
                                     ),
                                   ),
-                                ),
-                                suggestionsCallback: (pattern) {
-                                  return BackendService.getSuggestions(pattern);
-                                },
-                                itemBuilder: (context, suggestion) {
-                                  return ListTile(
-                                    title: Text(suggestion),
-                                  );
-                                },
-                                transitionBuilder:
-                                    (context, suggestionsBox, controller) {
-                                  return suggestionsBox;
-                                },
-                                onSuggestionSelected: (suggestion) {
-                                  int cnt=0;
-                                    // dropdownValue1 = " Select OBD Number ";
-
-
-                                  // postRequest(suggestion);
-                                  for (int i = 0; i < li3.details.length; i++) {
-                                    print(li3.details[i].cardName);
-                                    if ("${li3.details[i].cardName}" == suggestion) {
-
-                                      cardcode = li3.details[i].cardCode;
-
-                                      if(dropdownValue1=="Office")
-                                      {
-
-cnt=0;
-
-                                            if(li3.details[i].cardName.toLowerCase()==placemarks[0].locality.toLowerCase())
-                                            {
-                                              _typeAheadController.text =
-                                                  li3.details[i].cardName;
-cnt++;
-setState(() {
-
-  enableWorkStart=true;
-  enableWorkEnd=true;
-  visibletravel=false;
-});
-                                              cardcode = li3.details[i].cardCode;
-
-                                            }
-
-
-                                      }
-
-                                      // CustomerCodeController.text=li3.details[i].customer;
-                                      //
-                                      // dropdowncall(li3.details[i].customer);
-                                      // OutboundController.text=li3.details[i].delivery;
-
-                                    }
-                                  }
-if(dropdownValue1=="Office")
-  if(cnt==0) {
-    setState(() {
-
-      enableStartTravel=true;
-      enableEndTravel=true;
-      enableWorkStart=true;
-      enableWorkEnd=true;
-      visibletravel = true;
-    });
-
-    print("show");
-  }
-                                  print(cnt);
-                                  CheckValidation();
-                                  this._typeAheadController.text = suggestion;
-                                },
-                                validator: (value) {
-                                  if (value.isEmpty) {
-                                    return 'Please select a city';
-                                  } else
-                                    return 'nothing';
-                                },
-                                // onSaved: (value) => this._selectedCity = value,
-                              ),
-                            ),
-                            Divider(),
-                            Visibility(
-                              visible: visibletravel,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                children: [
-                                  RaisedButton(onPressed: enableStartTravel?(){
-                                    if(dropdownValue1!="Select Type"&&_typeAheadController.text!=""&&_typeAheadController.text!="Select Customer"&&_typeAheadController.text!="Select Office")
-
-                                      getlocation().then((value) {
-                                      placefromLATLNG();
-                                    }).then((value) => StartTravel());
-                                    else
-                                      Fluttertoast.showToast(msg: "Please Select Type and Customer or Office");
-                                  }:null,child: Text("Start Travel",style: TextStyle(color: Colors.white)),
+                                  RaisedButton(
+                                    onPressed: enableWorkEnd
+                                        ? () {
+                                            if (dropdownValue1 != "Select Type" &&
+                                                _typeAheadController.text !=
+                                                    "" &&
+                                                _typeAheadController.text !=
+                                                    "Select Customer" &&
+                                                _typeAheadController.text !=
+                                                    "Select Office")
+                                              getlocation().then((value) {
+                                                placefromLATLNG();
+                                              }).then((value) => WorkEnd());
+                                            else
+                                              Fluttertoast.showToast(
+                                                  msg:
+                                                      "Please Select Type and Customer or Office");
+                                          }
+                                        : null,
+                                    child: Text("Work End",
+                                        style: TextStyle(color: Colors.white)),
                                     elevation: 5,
                                     color: String_values.primarycolor,
                                     shape: RoundedRectangleBorder(
-                                      borderRadius:
-                                      BorderRadius.circular(25.0),
+                                      borderRadius: BorderRadius.circular(25.0),
                                     ),
                                   ),
-                                  RaisedButton(onPressed: enableEndTravel?(){
-                                    if(dropdownValue1!="Select Type"&&_typeAheadController.text!=""&&_typeAheadController.text!="Select Customer"&&_typeAheadController.text!="Select Office")
-
-                                      getlocation().then((value) {
-                                      placefromLATLNG();
-                                    }).then((value) => EndTravel());
-                                    else
-                                      Fluttertoast.showToast(msg: "Please Select Type and Customer or Office");
-                                  }:null,child: Text("End Travel",style: TextStyle(color: Colors.white)),
-                                    elevation: 5,
-                                    color: String_values.primarycolor,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius:
-                                      BorderRadius.circular(25.0),
-                                    ),),
-
                                 ],
                               ),
-                            ),
-
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                RaisedButton(
-                                  color: String_values.primarycolor,
-                                  onPressed: enableWorkStart?(){
-                                    if(dropdownValue1!="Select Type"&&_typeAheadController.text!=""&&_typeAheadController.text!="Select Customer"&&_typeAheadController.text!="Select Office")
-
-                                      getlocation().then((value) {
-                                      placefromLATLNG();
-                                    }).then((value) => WorkStart());
-                                    else
-                                      Fluttertoast.showToast(msg: "Please Select Type and Customer or Office");
-                                  }:null,child: Text("Work Start",style: TextStyle(color: Colors.white),),  elevation: 5,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius:
-                                    BorderRadius.circular(25.0),
-                                  ),),
-                                RaisedButton(onPressed: enableWorkEnd?(){
-                                  if(dropdownValue1!="Select Type"&&_typeAheadController.text!=""&&_typeAheadController.text!="Select Customer"&&_typeAheadController.text!="Select Office")
-                                  getlocation().then((value) {
-                                    placefromLATLNG();
-                                  }).then((value) =>WorkEnd());
-                                  else
-                                    Fluttertoast.showToast(msg: "Please Select Type and Customer or Office");
-                                }:null,child: Text("Work End",style: TextStyle(color: Colors.white)),
-                                  elevation: 5,
-                                  color: String_values.primarycolor,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius:
-                                    BorderRadius.circular(25.0),
-                                  ),),
-                              ],
-                            ),
-                            SizedBox(height: 10)
-                          ],
-                        ),
-                      )
-                    ],),
+                              SizedBox(height: 10)
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
                   )
-
                 ],
               )),
             ),
-        appBar: AppBar(
-          title: Text("Attendence"),
-        ),
-        // floatingActionButton: FloatingActionButton(
-        //     child: Icon(Icons.directions),
-        //     onPressed: () {
-        //       print("${locations[0].latitude},${locations[0].longitude}");
-        //       getlocationfromAddress(destinationaddress).then((value) {
-        //         _launchInBrowser(
-        //             "https://www.google.com/maps/dir/?api=1&origin=${position.latitude},${position.longitude}&destination=${locations[0].latitude},${locations[0].longitude}&travelmode=driving");
-        //       });
-        //     })
+      appBar: AppBar(
+        title: Text("Attendence"),
+      ),
+      // floatingActionButton: FloatingActionButton(
+      //     child: Icon(Icons.directions),
+      //     onPressed: () {
+      //       print("${locations[0].latitude},${locations[0].longitude}");
+      //       getlocationfromAddress(destinationaddress).then((value) {
+      //         _launchInBrowser(
+      //             "https://www.google.com/maps/dir/?api=1&origin=${position.latitude},${position.longitude}&destination=${locations[0].latitude},${locations[0].longitude}&travelmode=driving");
+      //       });
+      //     })
     );
   }
 
@@ -1162,8 +1209,6 @@ if(dropdownValue1=="Office")
       markerId: MarkerId("Driver"),
       position: LatLng(position.latitude, position.longitude),
     );
-
-
   }
 
   Future<void> getlocationfromAddress(address) async {
@@ -1183,39 +1228,50 @@ if(dropdownValue1=="Office")
   Future<void> boundarytake() async {
     GoogleMapController controller = await _controller.future;
     setState(() {
-      controller.moveCamera(CameraUpdate.newLatLngBounds(getBounds(listmarker), 150));
+      controller
+          .moveCamera(CameraUpdate.newLatLngBounds(getBounds(listmarker), 150));
     });
   }
 
   Future<void> placefromLATLNG() async {
+    placemarks = await placemarkFromCoordinates(currlat, currlon);
+    AddressController.text = placemarks[0].name +
+        ',' +
+        placemarks[0].street +
+        ',' +
+        placemarks[0].subLocality +
+        ',' +
+        placemarks[0].locality +
+        ',' +
+        placemarks[0].administrativeArea +
+        ',' +
+        placemarks[0].country +
+        ',' +
+        placemarks[0].postalCode;
+    print(AddressController.text);
+    setState(() {
+      marker = Marker(
+        markerId: MarkerId("Driver"),
+        position: LatLng(currlat, currlon),
+      );
+      markers.clear();
+      markers.add(marker);
+      _kGooglePlex = CameraPosition(target: LatLng(currlat, currlon), zoom: 16);
 
-   placemarks = await placemarkFromCoordinates(currlat, currlon);
-   AddressController.text=placemarks[0].name+','+placemarks[0].street+','+placemarks[0].subLocality+','+placemarks[0].locality+','+placemarks[0].administrativeArea+','+placemarks[0].country+','+placemarks[0].postalCode;
-   print(AddressController.text);
-   setState(() {
-     marker = Marker(
-       markerId: MarkerId("Driver"),
-       position: LatLng(currlat, currlon),
-     );
-     markers.clear();
-     markers.add(marker);
-     _kGooglePlex = CameraPosition(
-         target: LatLng(currlat, currlon), zoom: 16);
-
-     loading = false;
-     //    print("Markers "+markers.length.toString());
-   });
-
+      loading = false;
+      //    print("Markers "+markers.length.toString());
+    });
   }
 
   Future<void> prevstatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-     enableStartTravel= !prefs.getBool('tstart');
-    enableEndTravel= !prefs.getBool('tend');
-    enableWorkStart= !prefs.getBool('wstart');
-    enableWorkEnd= !prefs.getBool('wend');
+    enableStartTravel = !prefs.getBool('tstart');
+    enableEndTravel = !prefs.getBool('tend');
+    enableWorkStart = !prefs.getBool('wstart');
+    enableWorkEnd = !prefs.getBool('wend');
   }
 }
+
 class BackendService {
   static Future<List> getSuggestions(String query) async {
     List<String> s = new List();
@@ -1223,10 +1279,12 @@ class BackendService {
       // return ["No details"];
     } else {
       for (int i = 0; i < MapScreenState.li3.details.length; i++)
-        if (MapScreenState.li3.details[i].cardName.toString()
-            .toLowerCase()
-            .contains(query.toLowerCase()) ||
-            MapScreenState.li3.details[i].cardName.toString()
+        if (MapScreenState.li3.details[i].cardName
+                .toString()
+                .toLowerCase()
+                .contains(query.toLowerCase()) ||
+            MapScreenState.li3.details[i].cardName
+                .toString()
                 .toLowerCase()
                 .contains(query.toLowerCase()))
           s.add("${MapScreenState.li3.details[i].cardName}");
