@@ -21,6 +21,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:xml/xml.dart' as xml;
 
 import '../String_Values.dart';
+import 'LoginPage.dart';
 
 class MapScreen extends StatefulWidget {
   MapScreen({Key key, this.username});
@@ -876,30 +877,33 @@ class MapScreenState extends State<MapScreen> {
                                         if (dropdownValue1 == "Office") {
                                           customerListorOfficeList(1)
                                               .then((value) {
+
+                                                if(LoginScreenState.homeLoc!=null)
+                                                  {
                                             for (int i = 0;
                                                 i < li3.details.length;
                                                 i++)
                                               if (li3.details[i].cardName
                                                       .toLowerCase() ==
-                                                  placemarks[0]
-                                                      .locality
+                                                  LoginScreenState.homeLoc
                                                       .toLowerCase()) {
                                                 _typeAheadController.text =
                                                     li3.details[i].cardName;
 
                                                 cardcode =
                                                     li3.details[i].cardCode;
-                                                enableStartTravel = false;
-                                                enableEndTravel = false;
+                                                // enableStartTravel = false;
+                                                // enableEndTravel = false;
                                                 enableWorkStart = true;
                                                 enableWorkEnd = true;
                                                 visibletravel = false;
                                               }
-                                          });
+                                          }});
                                         } else if (dropdownValue1 ==
                                             "Customer") {
                                           customerListorOfficeList(2);
                                           visibletravel = true;
+
                                         } else
                                           Fluttertoast.showToast(
                                               msg:

@@ -23,11 +23,13 @@ class LoginScreenState extends State<LoginScreen> {
   static LoginModel li3;
 
   static var empID;
+  static String homeLoc;
 
-  Future<bool> setRegistered(username, empid) async {
+  Future<bool> setRegistered(username, empid,homeloc) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('Username', username);
     await prefs.setInt('EmpId', empid);
+    await prefs.setString("homeLoc", homeloc);
     await prefs.setBool('seen', true);
     return true;
   }
@@ -78,7 +80,7 @@ class LoginScreenState extends State<LoginScreen> {
         li3 = LoginModel.fromJson(decoded[0]);
         print(li3.firstName);
         empID= li3.empID;
-        setRegistered(li3.firstName, li3.empID);
+        setRegistered(li3.firstName, li3.empID,li3.homLoc);
         Fluttertoast.showToast(
             msg:"Login Success",
             toastLength: Toast.LENGTH_LONG,

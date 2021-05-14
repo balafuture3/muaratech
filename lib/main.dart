@@ -23,10 +23,12 @@ class MyApp extends StatelessWidget {
       if (_seen) {
         LoginScreenState.emailController.text = prefs.getString("Username");
         LoginScreenState.li3.empID = prefs.getInt("EmpId");
+        LoginScreenState.homeLoc = prefs.getString("homeLoc");
 
         print('Open sequence: Not First Time');
         print(LoginScreenState.emailController.text);
         print(LoginScreenState.li3.empID);
+        print(LoginScreenState.homeLoc);
       } else {
         // Set the flag to true at the end of onboarding screen if everything is successfull and so I am commenting it out
         // await prefs.setBool('seen', true);
@@ -75,10 +77,10 @@ class _LandingState extends State<Landing> {
       print('Open sequence: Not First Time');
       LoginScreenState.emailController.text = prefs.getString("Username");
       LoginScreenState.empID = prefs.getInt("EmpId");
-
+      LoginScreenState.homeLoc = prefs.getString("homeLoc");
 
       print(LoginScreenState.emailController.text);
-      // print(LoginScreenState.li3.empID);
+      print(LoginScreenState.homeLoc);
     } else {
       MapScreenState.setStatus(false, false,false,false);
       // Set the flag to true at the end of onboarding screen if everything is successfull and so I am commenting it out
