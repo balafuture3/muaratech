@@ -1020,7 +1020,7 @@ class MapScreenState extends State<MapScreen> {
                                       print("show");
                                     }
                                     print(cnt);
-                                    CheckValidation();
+                                    // CheckValidation();
                                     this._typeAheadController.text = suggestion;
                                   },
                                   validator: (value) {
