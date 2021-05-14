@@ -68,27 +68,24 @@ class MapScreenState extends State<MapScreen> {
     setState(() {
       loading = true;
     });
-    var envelope = '''
-<?xml version="1.0" encoding="utf-8"?>
-<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-  <soap:Body>
-    <IN_MOB_CHECKVALIDATION xmlns="http://tempuri.org/">
-      <USERID>${LoginScreenState.empID}</USERID>
-    </IN_MOB_CHECKVALIDATION>
-  </soap:Body>
-</soap:Envelope>
-
-''';
+    var envelope = '''<?xml version="1.0" encoding="utf-8"?>
+<soap12:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://www.w3.org/2003/05/soap-envelope">
+  <soap12:Body>
+    <IN_MOB_VALIDATIONNEW xmlns="http://tempuri.org/">
+      <UserID>${LoginScreenState.empID}</UserID>
+    </IN_MOB_VALIDATIONNEW>
+  </soap12:Body>
+</soap12:Envelope>''';
     print(envelope);
     var url =
-        'http://15.206.119.30:2021/Muratech/Service.asmx?op=IN_MOB_CHECKVALIDATION';
+        'http://15.206.119.30:2021/Muratech/Service.asmx?op=IN_MOB_VALIDATIONNEW';
     // Map data = {
     //   "username": EmailController.text,
     //   "password": PasswordController.text
     // };
 //    print("data: ${data}");
 //    print(String_values.base_url);
-
+    print(url);
     var response = await http.post(url,
         headers: {
           "Content-Type": "text/xml; charset=utf-8",
@@ -108,16 +105,16 @@ class MapScreenState extends State<MapScreen> {
 
         final decoded = json.decode(parsedXml.text);
         li5 = CheckValidationModel.fromJson(decoded[0]);
-        print(li5.cUSTOMERNAME);
+        print(li5.cUSNAME1);
         setState(() {
-         if (li5.wSTARTCUSPLACE=="Y"&&li5.wENDCUSPLACE=="Y"&&li5.tRAVELSTART=="Y"&&li5.tRAVELEND=="Y") {
+         if (li5.wORKSTART=="Y"&&li5.wORKEND=="Y"&&li5.sTOPTRAVEL=="Y"&&li5.sTARTTRAVEL=="Y") {
 
          }
          else {
-           dropdownValue1=li5.tRAVELTYPE;
-           _typeAheadController.text=li5.cUSTOMERNAME;
-           cardcode=li5.cUSTOMERCODE;
-           if(li5.tRAVELSTART == "Y" && li5.wENDCUSPLACE == "N") {
+           dropdownValue1=li5.tYPENAME;
+           _typeAheadController.text=li5.cUSNAME;
+           cardcode=li5.cUSCODE;
+           if(li5.sTARTTRAVEL == "Y" && li5.wORKEND == "N") {
              enableTypeahead = false;
              enableDropdown = false;
            }
@@ -126,10 +123,21 @@ class MapScreenState extends State<MapScreen> {
              enableTypeahead = true;
              enableDropdown = true;
            }
-           li5.wSTARTCUSPLACE == "Y" ? enableWorkStart = false : true;
-           if(li5.wENDCUSPLACE == "Y") { enableWorkEnd = false;enableWorkStart = true ;}else enableWorkEnd = true;
-           li5.tRAVELSTART == "Y" ? enableStartTravel = false : true;
-           li5.tRAVELEND == "Y" ? enableEndTravel = false : true;
+           li5.wORKSTART == "Y" ? enableWorkStart = false : true;
+           if(li5.wORKEND == "Y") { enableWorkEnd = false;enableWorkStart = true ;}else enableWorkEnd = true;
+           li5.sTARTTRAVEL == "Y" ? enableStartTravel = false : true;
+           li5.sTOPTRAVEL == "Y" ? enableEndTravel = false : true;
+
+           if(li5.tYPENAME=="Office")
+             {
+               if(li5.cUSNAME.toLowerCase()==placemarks[0].locality.toLowerCase())
+                 {
+                   setState(() {
+
+                     visibletravel=false;
+                   });
+                 }
+             }
          }
         });
 
@@ -173,33 +181,51 @@ class MapScreenState extends State<MapScreen> {
     setState(() {
       loading = true;
     });
-    var envelope = '''
-<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-  <soap:Body>
-    <IN_MOB_INSERT_STARTTRAVEL xmlns="http://tempuri.org/">
-      <TRAVELTYPE>${dropdownValue1}</TRAVELTYPE>
-      <CUSTOMERCODE>${cardcode}</CUSTOMERCODE>
-      <CUSTOMERNAME>${_typeAheadController.text}</CUSTOMERNAME>
-      <TRAVELSTART>Y</TRAVELSTART>
-      <T_STARTDATE>${DateFormat("yyyy-MM-dd").format(DateTime.now())}</T_STARTDATE>
-      <T_STARTTIME>${DateFormat("hh:mm a").format(DateTime.now())}</T_STARTTIME>
-      <T_STARTLATLANG>${currlat.toString()+','+currlon.toString()}</T_STARTLATLANG>
-      <T_STARTADDRESS>${AddressController.text}</T_STARTADDRESS>
-      <USERID>${LoginScreenState.empID}</USERID>
-    </IN_MOB_INSERT_STARTTRAVEL>
-  </soap:Body>
-</soap:Envelope>
 
-''';
+    var envelope = '''<?xml version="1.0" encoding="utf-8"?>
+<soap12:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://www.w3.org/2003/05/soap-envelope">
+  <soap12:Body>
+    <IN_MOB_STARTATTENDANCE xmlns="http://tempuri.org/">
+      <TypeCode>${dropdownValue1}</TypeCode>
+      <TypeName>${dropdownValue1}</TypeName>
+      <CusCode>${cardcode}</CusCode>
+      <CusName>${_typeAheadController.text}</CusName>
+      <StartTravel>Y</StartTravel>
+      <StartLatLang></StartLatLang>
+      <StartAddress></StartAddress>
+      <Remarks>test</Remarks>
+      <UserID>>${LoginScreenState.empID}</UserID>
+    </IN_MOB_STARTATTENDANCE>
+  </soap12:Body>
+</soap12:Envelope>''';
     print(envelope);
     var url =
-        'http://15.206.119.30:2021/Muratech/Service.asmx?op=IN_MOB_INSERT_STARTTRAVEL';
+        'http://15.206.119.30:2021/Muratech/Service.asmx?op=IN_MOB_STARTATTENDANCE';
+    http://15.206.119.30:2021/Muratech/Service.asmx?op=IN_MOB_STARTATTENDANCE
+    print(url);
     // Map data = {
     //   "username": EmailController.text,
     //   "password": PasswordController.text
     // };
 //    print("data: ${data}");
 //    print(String_values.base_url);
+//
+//
+// <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+//   <soap:Body>
+//     <IN_MOB_STARTATTENDANCE xmlns="http://tempuri.org/">
+//       <TRAVELTYPE>${dropdownValue1}</TRAVELTYPE>
+//       <CUSTOMERCODE>${cardcode}</CUSTOMERCODE>
+//       <CUSTOMERNAME>${_typeAheadController.text}</CUSTOMERNAME>
+//       <TRAVELSTART>Y</TRAVELSTART>
+//       <T_STARTDATE>${DateFormat("yyyy-MM-dd").format(DateTime.now())}</T_STARTDATE>
+//       <T_STARTTIME>${DateFormat("hh:mm a").format(DateTime.now())}</T_STARTTIME>
+//       <T_STARTLATLANG>${currlat.toString()+','+currlon.toString()}</T_STARTLATLANG>
+//       <T_STARTADDRESS>${AddressController.text}</T_STARTADDRESS>
+//       <USERID>${LoginScreenState.empID}</USERID>
+//     </IN_MOB_STARTATTENDANCE>
+//   </soap:Body>
+// </soap:Envelope>
 
     var response = await http.post(url,
         headers: {
@@ -282,33 +308,32 @@ else
     setState(() {
       loading = true;
     });
-    var envelope = '''
-    <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-  <soap:Body>
-    <IN_MOB_INSERT_END_TRAVEL xmlns="http://tempuri.org/">
-      <TRAVELTYPE>${dropdownValue1}</TRAVELTYPE>
-      <CUSTOMERCODE>${cardcode}</CUSTOMERCODE>
-      <CUSTOMERNAME>${_typeAheadController.text}</CUSTOMERNAME>
-      <TRAVELEND>Y</TRAVELEND>
-      <T_ENDDATE>${DateFormat("yyyy-MM-dd").format(DateTime.now())}</T_ENDDATE>
-      <T_ENDTIME>${DateFormat("hh:mm a").format(DateTime.now())}</T_ENDTIME>
-      <T_ENDLATLANG>${currlat.toString()+','+currlon.toString()}</T_ENDLATLANG>
-      <T_ENDADDRESS>${AddressController.text}</T_ENDADDRESS>
-      <USERID>${LoginScreenState.empID}</USERID>
-    </IN_MOB_INSERT_END_TRAVEL>
-  </soap:Body>
-</soap:Envelope>
-''';
+    var envelope = '''<?xml version="1.0" encoding="utf-8"?>
+<soap12:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://www.w3.org/2003/05/soap-envelope">
+  <soap12:Body>
+    <IN_MOB_STOPATTENDANCE xmlns="http://tempuri.org/">
+      <TypeCode>${dropdownValue1}</TypeCode>
+      <TypeName>${dropdownValue1}</TypeName>
+      <CusCode>${cardcode}</CusCode>
+      <CusName>${_typeAheadController.text}</CusName>
+      <StartTravel>Y</StartTravel>
+      <StartLatLang>${currlat.toString()+','+currlon.toString()}</StartLatLang>
+      <StartAddress>${AddressController.text}</StartAddress>
+      <Remarks>test</Remarks>
+      <UserID>>${LoginScreenState.empID}</UserID>
+    </IN_MOB_STOPATTENDANCE>
+  </soap12:Body>
+</soap12:Envelope>''';
     print(envelope);
     var url =
-        'http://15.206.119.30:2021/Muratech/Service.asmx?op=IN_MOB_INSERT_END_TRAVEL';
+        'http://15.206.119.30:2021/Muratech/Service.asmx?op=IN_MOB_STOPATTENDANCE';
     // Map data = {
     //   "username": EmailController.text,
     //   "password": PasswordController.text
     // };
 //    print("data: ${data}");
-//    print(String_values.base_url);
 
+print(url);
     var response = await http.post(url,
         headers: {
           "Content-Type": "text/xml; charset=utf-8",
@@ -394,32 +419,32 @@ else
     setState(() {
       loading = true;
     });
-    var envelope = '''
-    <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-  <soap:Body>
-    <IN_MOB_INSERT_STARTCUSPLACENEW xmlns="http://tempuri.org/">
-      <WorkStartLatlang>${currlat.toString()+','+currlon.toString()}</WorkStartLatlang>
-      <WorkStartAddress>${AddressController.text}</WorkStartAddress>
-      <WorkStartCity>${placemarks[0].locality}</WorkStartCity>
-      <UserID>${LoginScreenState.empID}</UserID>
-      <CUSCODE>${cardcode}</CUSCODE>
-      <CUSNAME>${_typeAheadController.text}</CUSNAME>
-      <WorkStartTypeCode>${dropdownValue1}</WorkStartTypeCode>
-      <WorkStartTypeName>${dropdownValue1}</WorkStartTypeName>
-    </IN_MOB_INSERT_STARTCUSPLACENEW>
-  </soap:Body>
-</soap:Envelope>
-''';
+    var envelope = '''<?xml version="1.0" encoding="utf-8"?>
+<soap12:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://www.w3.org/2003/05/soap-envelope">
+  <soap12:Body>
+    <IN_MOB_WORKSTRATATTENDANCE xmlns="http://tempuri.org/">
+      <TypeCode>${dropdownValue1}</TypeCode>
+      <TypeName>${dropdownValue1}</TypeName>
+      <CusCode>${cardcode}</CusCode>
+      <CusName>${_typeAheadController.text}</CusName>
+      <StartTravel>Y</StartTravel>
+      <StartLatLang>${currlat.toString()+','+currlon.toString()}</StartLatLang>
+      <StartAddress>${AddressController.text}</StartAddress>
+      <Remarks>test</Remarks>
+      <UserID>>${LoginScreenState.empID}</UserID>
+    </IN_MOB_WORKSTRATATTENDANCE>
+  </soap12:Body>
+</soap12:Envelope>''';
     print(envelope);
     var url =
-        'http://15.206.119.30:2021/Muratech/Service.asmx?op=IN_MOB_INSERT_STARTCUSPLACENEW';
+        'http://15.206.119.30:2021/Muratech/Service.asmx?op=IN_MOB_WORKSTRATATTENDANCE';
     // Map data = {
     //   "username": EmailController.text,
     //   "password": PasswordController.text
     // };
 //    print("data: ${data}");
 //    print(String_values.base_url);
-
+    print(url);
     var response = await http.post(url,
         headers: {
           "Content-Type": "text/xml; charset=utf-8",
@@ -502,24 +527,27 @@ else
     setState(() {
       loading = true;
     });
-    var envelope = '''
-<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-  <soap:Body>
-    <IN_MOB_INSERT_ENDCUSPLACENEW xmlns="http://tempuri.org/">
-      <WorkEndLatlang>${currlat.toString()+','+currlon.toString()}</WorkEndLatlang>
-      <WorkEndAddress>${AddressController.text}</WorkEndAddress>
-      <WorkEndCity>${placemarks[0].locality}</WorkEndCity>
-      <UserID>${LoginScreenState.empID}</UserID>
-      <KM>"0"</KM>
-      <CUSCODE>${cardcode}</CUSCODE>
-      <CUSNAME>${_typeAheadController.text}</CUSNAME>
-    </IN_MOB_INSERT_ENDCUSPLACENEW>
-  </soap:Body>
-</soap:Envelope>
+    var envelope = '''<?xml version="1.0" encoding="utf-8"?>
+<soap12:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://www.w3.org/2003/05/soap-envelope">
+  <soap12:Body>
+    <IN_MOB_WORKENDATTENDANCE xmlns="http://tempuri.org/">
+      <TypeCode>${dropdownValue1}</TypeCode>
+      <TypeName>${dropdownValue1}</TypeName>
+      <CusCode>${cardcode}</CusCode>
+      <CusName>${_typeAheadController.text}</CusName>
+      <StartTravel>Y</StartTravel>
+      <StartLatLang>${currlat.toString()+','+currlon.toString()}</StartLatLang>
+      <StartAddress>${AddressController.text}</StartAddress>
+      <Remarks>test</Remarks>
+      <UserID>>${LoginScreenState.empID}</UserID>
+    </IN_MOB_WORKENDATTENDANCE>
+  </soap12:Body>
+</soap12:Envelope>
 ''';
     print(envelope);
     var url =
-        'http://15.206.119.30:2021/Muratech/Service.asmx?op=IN_MOB_INSERT_ENDCUSPLACENEW';
+        'http://15.206.119.30:2021/Muratech/Service.asmx?op=IN_MOB_WORKENDATTENDANCE';
+    print(url);
     // Map data = {
     //   "username": EmailController.text,
     //   "password": PasswordController.text

@@ -47,9 +47,7 @@ class LoginScreenState extends State<LoginScreen> {
       <UserPassword>${passwordController.text}</UserPassword>
     </IN_MOB_LOGIN>
   </soap:Body>
-</soap:Envelope>
-
-''';
+</soap:Envelope>''';
     print(envelope);
     var url =
         'http://15.206.119.30:2021/Muratech/Service.asmx?op=IN_MOB_LOGIN';

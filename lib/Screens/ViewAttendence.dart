@@ -75,17 +75,17 @@ class ViewAttendenceState extends State<ViewAttendence> {
 <?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
   <soap:Body>
-    <IN_MOB_TRAVEL_REPORT xmlns="http://tempuri.org/">
+    <IN_MOB_TRAVEL_REPORT1 xmlns="http://tempuri.org/">
       <USERID>${LoginScreenState.empID}</USERID>
       <FromDate>${StartDateController.text}</FromDate>
       <ToDate>${EndDateController.text}</ToDate>
-    </IN_MOB_TRAVEL_REPORT>
+    </IN_MOB_TRAVEL_REPORT1>
   </soap:Body>
 </soap:Envelope>
 ''';
     print(envelope);
     var url =
-        'http://15.206.119.30:2021/Muratech/Service.asmx?op=IN_MOB_TRAVEL_REPORT';
+        'http://15.206.119.30:2021/Muratech/Service.asmx?op=IN_MOB_TRAVEL_REPORT1';
     // Map data = {
     //   "username": EmailController.text,
     //   "password": PasswordController.text
