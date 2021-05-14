@@ -7,6 +7,7 @@ import 'package:muratech/String_Values.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'LoginPage.dart';
+import 'LoginPage.dart';
 
 class Dashboard extends StatefulWidget {
   Dashboard({Key key, this.name});
@@ -16,6 +17,13 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
+  @override
+  void initState() {
+    print(LoginScreenState.homeLoc);
+    // TODO: implement initState
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;

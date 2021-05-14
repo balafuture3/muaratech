@@ -553,8 +553,9 @@ class MapScreenState extends State<MapScreen> {
         final decoded = json.decode(parsedXml.text);
         li4 = SuccessResponse.fromJson(decoded[0]);
         print(li4.sTATUSMSG);
-        if (li4.sTATUS == "1") {
-          setStatus(true, false, true, true);
+        if (li4.sTATUS == "1"||li4.sTATUS == "2") {
+          print("true");
+          // setStatus(true, false, true, true);
           setState(() {
             enableTypeahead = true;
             enableDropdown = true;
