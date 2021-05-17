@@ -108,9 +108,18 @@ class MapScreenState extends State<MapScreen> {
               li5.sTOPTRAVEL == "Y" &&
               li5.sTARTTRAVEL == "Y") {
           } else {
-            dropdownValue1 = li5.tYPENAME;
-            _typeAheadController.text = li5.cUSNAME;
-            cardcode = li5.cUSCODE;
+            if (li5.tYPENAME != "")
+              dropdownValue1 = li5.tYPENAME;
+            else
+              dropdownValue1 = li5.tYPENAME1;
+            if (li5.cUSNAME != "")
+              _typeAheadController.text = li5.cUSNAME;
+            else
+              _typeAheadController.text = li5.cUSNAME1;
+            if (li5.cUSCODE != "")
+              cardcode = li5.cUSCODE;
+            else
+              cardcode = li5.cUSCODE1;
             if (li5.sTARTTRAVEL == "Y" && li5.wORKEND == "N") {
               enableTypeahead = false;
               enableDropdown = false;
@@ -128,11 +137,38 @@ class MapScreenState extends State<MapScreen> {
             li5.sTOPTRAVEL == "Y" ? enableEndTravel = false : true;
 
             if (li5.tYPENAME == "Office") {
-              if (li5.cUSNAME.toLowerCase() ==
-                  placemarks[0].locality.toLowerCase()) {
-                setState(() {
-                  visibletravel = false;
-                });
+              if (li5.cUSNAME != "") {
+                if (li5.cUSNAME.toLowerCase() ==
+                    LoginScreenState.homeLoc.toLowerCase()) {
+                  setState(() {
+                    visibletravel = false;
+                  });
+                }
+              } else if (li5.cUSNAME1 != "") {
+                if (li5.cUSNAME1.toLowerCase() ==
+                    LoginScreenState.homeLoc.toLowerCase()) {
+                  setState(() {
+                    visibletravel = false;
+                  });
+                }
+              }
+            }
+
+            if (li5.tYPENAME1 == "Office") {
+              if (li5.cUSNAME != "") {
+                if (li5.cUSNAME.toLowerCase() ==
+                    LoginScreenState.homeLoc.toLowerCase()) {
+                  setState(() {
+                    visibletravel = false;
+                  });
+                }
+              } else if (li5.cUSNAME1 != "") {
+                if (li5.cUSNAME1.toLowerCase() ==
+                    LoginScreenState.homeLoc.toLowerCase()) {
+                  setState(() {
+                    visibletravel = false;
+                  });
+                }
               }
             }
           }
@@ -169,6 +205,12 @@ class MapScreenState extends State<MapScreen> {
     setState(() {
       loading = true;
     });
+    String location;
+    if (_serviceEnabled) {
+      location = "";
+      AddressController.text = "";
+    } else
+      location = currlat.toString() + ',' + currlon.toString();
 
     var envelope = '''<?xml version="1.0" encoding="utf-8"?>
 <soap12:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://www.w3.org/2003/05/soap-envelope">
@@ -179,7 +221,7 @@ class MapScreenState extends State<MapScreen> {
       <CusCode>${cardcode}</CusCode>
       <CusName>${_typeAheadController.text}</CusName>
       <StartTravel>Y</StartTravel>
-      <StartLatLang>${currlat.toString() + ',' + currlon.toString()}</StartLatLang>
+      <StartLatLang>${location}</StartLatLang>
       <StartAddress>${AddressController.text}</StartAddress>
       <Remarks>test</Remarks>
       <UserID>${LoginScreenState.empID}</UserID>
@@ -293,6 +335,12 @@ class MapScreenState extends State<MapScreen> {
     setState(() {
       loading = true;
     });
+    String location;
+    if (_serviceEnabled) {
+      location = "";
+      AddressController.text = "";
+    } else
+      location = currlat.toString() + ',' + currlon.toString();
     var envelope = '''<?xml version="1.0" encoding="utf-8"?>
 <soap12:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://www.w3.org/2003/05/soap-envelope">
   <soap12:Body>
@@ -302,7 +350,7 @@ class MapScreenState extends State<MapScreen> {
       <CusCode>${cardcode}</CusCode>
       <CusName>${_typeAheadController.text}</CusName>
       <StartTravel>Y</StartTravel>
-      <StartLatLang>${currlat.toString() + ',' + currlon.toString()}</StartLatLang>
+      <StartLatLang>${location}</StartLatLang>
       <StartAddress>${AddressController.text}</StartAddress>
       <Remarks>test</Remarks>
       <UserID>${LoginScreenState.empID}</UserID>
@@ -401,6 +449,12 @@ class MapScreenState extends State<MapScreen> {
     setState(() {
       loading = true;
     });
+    String location;
+    if (_serviceEnabled) {
+      location = "";
+      AddressController.text = "";
+    } else
+      location = currlat.toString() + ',' + currlon.toString();
     var envelope = '''<?xml version="1.0" encoding="utf-8"?>
 <soap12:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://www.w3.org/2003/05/soap-envelope">
   <soap12:Body>
@@ -410,7 +464,7 @@ class MapScreenState extends State<MapScreen> {
       <CusCode>${cardcode}</CusCode>
       <CusName>${_typeAheadController.text}</CusName>
       <StartTravel>Y</StartTravel>
-      <StartLatLang>${currlat.toString() + ',' + currlon.toString()}</StartLatLang>
+      <StartLatLang>${location}</StartLatLang>
       <StartAddress>${AddressController.text}</StartAddress>
       <Remarks>test</Remarks>
       <UserID>${LoginScreenState.empID}</UserID>
@@ -509,6 +563,12 @@ class MapScreenState extends State<MapScreen> {
     setState(() {
       loading = true;
     });
+    String location;
+    if (_serviceEnabled) {
+      location = "";
+      AddressController.text = "";
+    } else
+      location = currlat.toString() + ',' + currlon.toString();
     var envelope = '''<?xml version="1.0" encoding="utf-8"?>
 <soap12:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://www.w3.org/2003/05/soap-envelope">
   <soap12:Body>
@@ -518,7 +578,7 @@ class MapScreenState extends State<MapScreen> {
       <CusCode>${cardcode}</CusCode>
       <CusName>${_typeAheadController.text}</CusName>
       <StartTravel>Y</StartTravel>
-      <StartLatLang>${currlat.toString() + ',' + currlon.toString()}</StartLatLang>
+      <StartLatLang>${location}</StartLatLang>
       <StartAddress>${AddressController.text}</StartAddress>
       <Remarks>test</Remarks>
       <UserID>${LoginScreenState.empID}</UserID>
@@ -553,7 +613,7 @@ class MapScreenState extends State<MapScreen> {
         final decoded = json.decode(parsedXml.text);
         li4 = SuccessResponse.fromJson(decoded[0]);
         print(li4.sTATUSMSG);
-        if (li4.sTATUS == "1"||li4.sTATUS == "2") {
+        if (li4.sTATUS == "1" || li4.sTATUS == "2") {
           print("true");
           // setStatus(true, false, true, true);
           setState(() {
@@ -725,6 +785,7 @@ class MapScreenState extends State<MapScreen> {
   }
 
   Completer<GoogleMapController> _controller = Completer();
+  bool _serviceEnabled = false;
   var _kGooglePlex;
   Marker marker;
   String destinationaddress;
@@ -746,15 +807,28 @@ class MapScreenState extends State<MapScreen> {
   void initState() {
 // prevstatus();
 
+    _kGooglePlex = CameraPosition(target: LatLng(0, 0), zoom: 16);
+
     enableTypeahead = true;
     enableDropdown = true;
 
-    getlocation().then((value) {
-      currlat = position.latitude;
+    getLocationEnabled().then((value) {
+      print("Service enabled${_serviceEnabled}");
+      if (_serviceEnabled) {
+        getlocation().then((value) {
+          print("getlocation");
+          if (position.latitude != null) {
+            currlat = position.latitude;
 
-      currlon = position.longitude;
-      placefromLATLNG().then((value) => CheckValidation());
+            currlon = position.longitude;
+            placefromLATLNG();
+          }
+          CheckValidation();
+        });
+      } else
+        CheckValidation();
     });
+
 //     location.onLocationChanged.listen((locate.LocationData currentLocation) {
 // setState(() {
 //   currlat=currentLocation.latitude;
@@ -878,9 +952,6 @@ class MapScreenState extends State<MapScreen> {
                                         if (dropdownValue1 == "Office") {
                                           customerListorOfficeList(1)
                                               .then((value) {
-
-                                                if(LoginScreenState.homeLoc!=null)
-                                                  {
                                             for (int i = 0;
                                                 i < li3.details.length;
                                                 i++)
@@ -893,18 +964,17 @@ class MapScreenState extends State<MapScreen> {
 
                                                 cardcode =
                                                     li3.details[i].cardCode;
-                                                // enableStartTravel = false;
-                                                // enableEndTravel = false;
+                                                enableStartTravel = true;
+                                                enableEndTravel = true;
                                                 enableWorkStart = true;
                                                 enableWorkEnd = true;
                                                 visibletravel = false;
                                               }
-                                          }});
+                                          });
                                         } else if (dropdownValue1 ==
                                             "Customer") {
                                           customerListorOfficeList(2);
                                           visibletravel = true;
-
                                         } else
                                           Fluttertoast.showToast(
                                               msg:
@@ -987,21 +1057,22 @@ class MapScreenState extends State<MapScreen> {
 
                                         if (dropdownValue1 == "Office") {
                                           cnt = 0;
-
-                                          if (li3.details[i].cardName
-                                                  .toLowerCase() ==
-                                              placemarks[0]
-                                                  .locality
-                                                  .toLowerCase()) {
-                                            _typeAheadController.text =
-                                                li3.details[i].cardName;
-                                            cnt++;
-                                            setState(() {
-                                              enableWorkStart = true;
-                                              enableWorkEnd = true;
-                                              visibletravel = false;
-                                            });
-                                            cardcode = li3.details[i].cardCode;
+                                          if (_serviceEnabled) {
+                                            if (li3.details[i].cardName
+                                                    .toLowerCase() ==
+                                                LoginScreenState.homeLoc
+                                                    .toLowerCase()) {
+                                              _typeAheadController.text =
+                                                  li3.details[i].cardName;
+                                              cnt++;
+                                              setState(() {
+                                                enableWorkStart = true;
+                                                enableWorkEnd = true;
+                                                visibletravel = false;
+                                              });
+                                              cardcode =
+                                                  li3.details[i].cardCode;
+                                            }
                                           }
                                         }
 
@@ -1053,12 +1124,15 @@ class MapScreenState extends State<MapScreen> {
                                                   _typeAheadController.text !=
                                                       "Select Customer" &&
                                                   _typeAheadController.text !=
-                                                      "Select Office")
-                                                getlocation().then((value) {
-                                                  placefromLATLNG();
-                                                }).then(
-                                                    (value) => StartTravel());
-                                              else
+                                                      "Select Office") {
+                                                if (_serviceEnabled)
+                                                  getlocation().then((value) {
+                                                    placefromLATLNG();
+                                                  }).then(
+                                                      (value) => StartTravel());
+                                                else
+                                                  StartTravel();
+                                              } else
                                                 Fluttertoast.showToast(
                                                     msg:
                                                         "Please Select Type and Customer or Office");
@@ -1083,11 +1157,15 @@ class MapScreenState extends State<MapScreen> {
                                                   _typeAheadController.text !=
                                                       "Select Customer" &&
                                                   _typeAheadController.text !=
-                                                      "Select Office")
-                                                getlocation().then((value) {
-                                                  placefromLATLNG();
-                                                }).then((value) => EndTravel());
-                                              else
+                                                      "Select Office") {
+                                                if (_serviceEnabled)
+                                                  getlocation().then((value) {
+                                                    placefromLATLNG();
+                                                  }).then(
+                                                      (value) => EndTravel());
+                                                else
+                                                  EndTravel();
+                                              } else
                                                 Fluttertoast.showToast(
                                                     msg:
                                                         "Please Select Type and Customer or Office");
@@ -1120,11 +1198,14 @@ class MapScreenState extends State<MapScreen> {
                                                 _typeAheadController.text !=
                                                     "Select Customer" &&
                                                 _typeAheadController.text !=
-                                                    "Select Office")
-                                              getlocation().then((value) {
-                                                placefromLATLNG();
-                                              }).then((value) => WorkStart());
-                                            else
+                                                    "Select Office") {
+                                              if (_serviceEnabled)
+                                                getlocation().then((value) {
+                                                  placefromLATLNG();
+                                                }).then((value) => WorkStart());
+                                              else
+                                                WorkStart();
+                                            } else
                                               Fluttertoast.showToast(
                                                   msg:
                                                       "Please Select Type and Customer or Office");
@@ -1148,11 +1229,14 @@ class MapScreenState extends State<MapScreen> {
                                                 _typeAheadController.text !=
                                                     "Select Customer" &&
                                                 _typeAheadController.text !=
-                                                    "Select Office")
-                                              getlocation().then((value) {
-                                                placefromLATLNG();
-                                              }).then((value) => WorkEnd());
-                                            else
+                                                    "Select Office") {
+                                              if (_serviceEnabled)
+                                                getlocation().then((value) {
+                                                  placefromLATLNG();
+                                                }).then((value) => WorkEnd());
+                                              else
+                                                WorkEnd();
+                                            } else
                                               Fluttertoast.showToast(
                                                   msg:
                                                       "Please Select Type and Customer or Office");
@@ -1201,6 +1285,10 @@ class MapScreenState extends State<MapScreen> {
   // //   AndroidDeviceInfo androidDeviceInfo = await deviceInfo.androidInfo;
   // // print(androidDeviceInfo);
   // }
+  Future<void> getLocationEnabled() async {
+    _serviceEnabled = await location.serviceEnabled();
+  }
+
   Future<void> getlocation() async {
     setState(() {
       loading = true;

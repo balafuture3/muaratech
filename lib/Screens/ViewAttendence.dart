@@ -4,12 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
-import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
-import 'package:multi_select_flutter/dialog/mult_select_dialog.dart';
-import 'package:muratech/Models/SuccessModel.dart';
+import 'package:intl/intl.dart';
 import 'package:muratech/Models/ViewAttendenceModel.dart';
 import 'package:xml/xml.dart' as xml;
 
@@ -493,468 +490,512 @@ class ViewAttendenceState extends State<ViewAttendence> {
         appBar: AppBar(
           title: Text("View Attendence"),
         ),
-        body: loading?Center(child: CircularProgressIndicator()):SingleChildScrollView(
-            child: Column(children: [
-          SizedBox(
-            height: height / 30,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Container(
-                  height: 55,
-                  width: width / 2.2,
-                  child: TextField(
-                    onTap: () async {
-                      DateTime date = DateTime(1900);
-                      FocusScope.of(context).requestFocus(new FocusNode());
-
-                      date = await showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime.now()
-                              .subtract(new Duration(days: 365 * 120)),
-                          lastDate:
-                              DateTime.now().add(new Duration(days: 365)));
-
-                      StartDateController.text = date.day.toString().padLeft(2, "0")+'/'+date.month.toString().padLeft(2, "0") +'/'+date.year.toString();
-                      // AssetList();
-                    },
-                    enabled: true,
-                    controller: StartDateController,
-                    decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.calendar_today_outlined),
-                      labelText: 'Start Date',
-                      hintStyle: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 16.0,
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(25.0),
-                      ),
-                    ),
-                  )),
-              Container(
-                  height: 55,
-                  width: width / 2.2,
-                  child: TextField(
-                    onTap: () async {
-                      DateTime date = DateTime(1900);
-                      FocusScope.of(context).requestFocus(new FocusNode());
-
-                      date = await showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime.now()
-                              .subtract(new Duration(days: 365 * 120)),
-                          lastDate:
-                              DateTime.now().add(new Duration(days: 365)));
-
-                      EndDateController.text = date.day.toString().padLeft(2, "0")+'/'+date.month.toString().padLeft(2, "0") +'/'+date.year.toString()
-
-                          ;
-                      // AssetList();
-                    },
-                    enabled: true,
-                    controller: EndDateController,
-                    decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.calendar_today_outlined),
-                      labelText: 'End Date',
-                      hintStyle: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 16.0,
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(25.0),
-                      ),
-                    ),
-                  )),
-            ],
-          ),
-          SizedBox(
-            height: height / 30,
-          ),
-          Container(
-              width: width / 2,
-              height: 50,
-              child: RaisedButton(
-                onPressed: () {
-                  GetAttendence();
-                },
-                child: Text(
-                  "Search",
-                  style: TextStyle(color: Colors.white),
+        body: loading
+            ? Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
+                child: Column(children: [
+                SizedBox(
+                  height: height / 30,
                 ),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(50))),
-                color: String_values.primarycolor,
-              )),
-          SizedBox(
-            height: height / 30,
-          ),
-          SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: DataTable(
-                headingRowColor:
-                MaterialStateColor.resolveWith((states) => String_values.primarycolor),
-                  columnSpacing: 5,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Container(
+                        height: 55,
+                        width: width / 2.2,
+                        child: TextField(
+                          onTap: () async {
+                            DateTime date = DateTime(1900);
+                            FocusScope.of(context)
+                                .requestFocus(new FocusNode());
 
+                            date = await showDatePicker(
+                                context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime.now()
+                                    .subtract(new Duration(days: 365 * 120)),
+                                lastDate: DateTime.now()
+                                    .add(new Duration(days: 365)));
 
-                  columns:
-
-                  [
-
-                    // DataColumn(
-                    //   label: Center(
-                    //       child: Wrap(
-                    //     direction: Axis.vertical, //default
-                    //     alignment: WrapAlignment.center,
-                    //     children: [
-                    //       Text(
-                    //         "S.No",
-                    //         softWrap: true,
-                    //
-                    //         style: TextStyle(fontSize: 12,color: Colors.white),
-                    //         textAlign: TextAlign.center,
-                    //       ),
-                    //     ],
-                    //   )),
-                    //   numeric: false,
-                    //
-                    //   // onSort: (columnIndex, ascending) {
-                    //   //   onSortColum(columnIndex, ascending);
-                    //   //   setState(() {
-                    //   //     sort = !sort;
-                    //   //   });
-                    //   // }
-                    // ),
-                    DataColumn(
-                      label: Center(
-                          child: Wrap(
-                        direction: Axis.vertical, //default
-                        alignment: WrapAlignment.center,
-                        children: [
-                          Text("Date",
-                              softWrap: true,
-                              style: TextStyle(fontSize: 12,color: Colors.white),
-                              textAlign: TextAlign.center),
-                        ],
-                      )),
-                      numeric: false,
-
-                      // onSort: (columnIndex, ascending) {
-                      //   onSortColum(columnIndex, ascending);
-                      //   setState(() {
-                      //     sort = !sort;
-                      //   });
-                      // }
-                    ),
-                    DataColumn(
-                      label: Center(
-                          child: Wrap(
-                        direction: Axis.vertical, //default
-                        alignment: WrapAlignment.center,
-                        children: [
-                          Text("Customer Name",
-                              softWrap: true,
-                              style: TextStyle(fontSize: 12,color: Colors.white),
-                              textAlign: TextAlign.center),
-                        ],
-                      )),
-                      numeric: false,
-
-                      // onSort: (columnIndex, ascending) {
-                      //   onSortColum(columnIndex, ascending);
-                      //   setState(() {
-                      //     sort = !sort;
-                      //   });
-                      // }
-                    ),
-
-                    DataColumn(
-                      label: Wrap(
-                        direction: Axis.vertical, //default
-                        alignment: WrapAlignment.end,
-                        children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text("Start",
-                              softWrap: true,
-                              style: TextStyle(fontSize: 16,color: Colors.white),
-                              textAlign: TextAlign.end),
-                          Divider(color: Colors.white,
-                            thickness: 5,
-                            height: 5,),
-                          Text("Travel Start           ",
-                              softWrap: true,
-                              style: TextStyle(fontSize: 12,color: Colors.white),
-                              textAlign: TextAlign.end),
-                        ],
-                      ),
-                        ],
-                      ),
-                      numeric: false,
-
-                      // onSort: (columnIndex, ascending) {
-                      //   onSortColum(columnIndex, ascending);
-                      //   setState(() {
-                      //     sort = !sort;
-                      //   });
-                      // }
-                    ),
-                    DataColumn(
-
-                      label: Center(
-                          child: Wrap(
-                        direction: Axis.vertical, //default
-                        alignment: WrapAlignment.center,
-                        children: [
-                          Text("Time",
-                              softWrap: true,
-                              style: TextStyle(fontSize: 16,color: Colors.white),
-                              textAlign: TextAlign.center),
-                          Divider(color: Colors.white,
-                          thickness: 5,
-                          height: 5,),
-                          Text("Work Start",
-                              softWrap: true,
-                              style: TextStyle(fontSize: 12,color: Colors.white),
-                              textAlign: TextAlign.center),
-                        ],
-                      )),
-                      numeric: false,
-
-                      // onSort: (columnIndex, ascending) {
-                      //   onSortColum(columnIndex, ascending);
-                      //   setState(() {
-                      //     sort = !sort;
-                      //   });
-                      // }
-                    ),
-                    DataColumn(
-                      label: Wrap(
-                        direction: Axis.vertical, //default
-                        alignment: WrapAlignment.end,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text("End",
-                                  softWrap: true,
-                                  style: TextStyle(fontSize: 16,color: Colors.white),
-                                  textAlign: TextAlign.end),
-                              Divider(color: Colors.white,
-                                thickness: 5,
-                                height: 5,),
-                              Text("Travel End              ",
-                                  softWrap: true,
-                                  style: TextStyle(fontSize: 12,color: Colors.white),
-                                  textAlign: TextAlign.end),
-                            ],
+                            StartDateController.text =
+                                date.day.toString().padLeft(2, "0") +
+                                    '/' +
+                                    date.month.toString().padLeft(2, "0") +
+                                    '/' +
+                                    date.year.toString();
+                            // AssetList();
+                          },
+                          enabled: true,
+                          controller: StartDateController,
+                          decoration: InputDecoration(
+                            prefixIcon: Icon(Icons.calendar_today_outlined),
+                            labelText: 'Start Date',
+                            hintStyle: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 16.0,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(25.0),
+                            ),
                           ),
-                        ],
+                        )),
+                    Container(
+                        height: 55,
+                        width: width / 2.2,
+                        child: TextField(
+                          onTap: () async {
+                            DateTime date = DateTime(1900);
+                            FocusScope.of(context)
+                                .requestFocus(new FocusNode());
+
+                            date = await showDatePicker(
+                                context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime.now()
+                                    .subtract(new Duration(days: 365 * 120)),
+                                lastDate: DateTime.now()
+                                    .add(new Duration(days: 365)));
+
+                            EndDateController.text =
+                                date.day.toString().padLeft(2, "0") +
+                                    '/' +
+                                    date.month.toString().padLeft(2, "0") +
+                                    '/' +
+                                    date.year.toString();
+                            // AssetList();
+                          },
+                          enabled: true,
+                          controller: EndDateController,
+                          decoration: InputDecoration(
+                            prefixIcon: Icon(Icons.calendar_today_outlined),
+                            labelText: 'End Date',
+                            hintStyle: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 16.0,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(25.0),
+                            ),
+                          ),
+                        )),
+                  ],
+                ),
+                SizedBox(
+                  height: height / 30,
+                ),
+                Container(
+                    width: width / 2,
+                    height: 50,
+                    child: RaisedButton(
+                      onPressed: () {
+                        GetAttendence();
+                      },
+                      child: Text(
+                        "Search",
+                        style: TextStyle(color: Colors.white),
                       ),
-                      numeric: false,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(50))),
+                      color: String_values.primarycolor,
+                    )),
+                SizedBox(
+                  height: height / 30,
+                ),
+                li4 != null
+                    ? SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: DataTable(
+                          headingRowColor: MaterialStateColor.resolveWith(
+                              (states) => String_values.primarycolor),
+                          columnSpacing: 5,
 
-                      // onSort: (columnIndex, ascending) {
-                      //   onSortColum(columnIndex, ascending);
-                      //   setState(() {
-                      //     sort = !sort;
-                      //   });
-                      // }
-                    ),
-                    DataColumn(
+                          columns: [
+                            // DataColumn(
+                            //   label: Center(
+                            //       child: Wrap(
+                            //     direction: Axis.vertical, //default
+                            //     alignment: WrapAlignment.center,
+                            //     children: [
+                            //       Text(
+                            //         "S.No",
+                            //         softWrap: true,
+                            //
+                            //         style: TextStyle(fontSize: 12,color: Colors.white),
+                            //         textAlign: TextAlign.center,
+                            //       ),
+                            //     ],
+                            //   )),
+                            //   numeric: false,
+                            //
+                            //   // onSort: (columnIndex, ascending) {
+                            //   //   onSortColum(columnIndex, ascending);
+                            //   //   setState(() {
+                            //   //     sort = !sort;
+                            //   //   });
+                            //   // }
+                            // ),
+                            DataColumn(
+                              label: Center(
+                                  child: Wrap(
+                                direction: Axis.vertical, //default
+                                alignment: WrapAlignment.center,
+                                children: [
+                                  Text("Date",
+                                      softWrap: true,
+                                      style: TextStyle(
+                                          fontSize: 12, color: Colors.white),
+                                      textAlign: TextAlign.center),
+                                ],
+                              )),
+                              numeric: false,
 
-                      label: Center(
-                          child: Wrap(
-                            direction: Axis.vertical, //default
-                            alignment: WrapAlignment.center,
-                            children: [
-                              Text("Time",
-                                  softWrap: true,
-                                  style: TextStyle(fontSize: 16,color: Colors.white),
-                                  textAlign: TextAlign.center),
-                              Divider(color: Colors.white,
-                                thickness: 5,
-                                height: 5,),
-                              Text("Work End   ",
-                                  softWrap: true,
-                                  style: TextStyle(fontSize: 12,color: Colors.white),
-                                  textAlign: TextAlign.center),
-                            ],
-                          )),
-                      numeric: false,
+                              // onSort: (columnIndex, ascending) {
+                              //   onSortColum(columnIndex, ascending);
+                              //   setState(() {
+                              //     sort = !sort;
+                              //   });
+                              // }
+                            ),
+                            DataColumn(
+                              label: Center(
+                                  child: Wrap(
+                                direction: Axis.vertical, //default
+                                alignment: WrapAlignment.center,
+                                children: [
+                                  Text("Customer Name",
+                                      softWrap: true,
+                                      style: TextStyle(
+                                          fontSize: 12, color: Colors.white),
+                                      textAlign: TextAlign.center),
+                                ],
+                              )),
+                              numeric: false,
 
-                      // onSort: (columnIndex, ascending) {
-                      //   onSortColum(columnIndex, ascending);
-                      //   setState(() {
-                      //     sort = !sort;
-                      //   });
-                      // }
-                    ),
-                  ],
-                  rows: [
-                    for(int list=0;list<li4.details.length;list++)
-            DataRow(cells: [
-                  // DataCell(Center(
-                  //     child: Center(
-                  //   child: Wrap(
-                  //       direction: Axis.vertical, //default
-                  //       alignment: WrapAlignment.center,
-                  //       children: [
-                  //         Text(
-                  //           (list+1).toString(),
-                  //           textAlign: TextAlign.center,
-                  //         )
-                  //       ]),
-                  // ))),
-                  DataCell(Center(
-                      child: Center(
-                    child: Wrap(
-                        direction: Axis.vertical, //default
-                        alignment: WrapAlignment.center,
-                        children: [
-                          Text(li4.details[list].dOCDATE.toString(),
-                              textAlign: TextAlign.center)
-                        ]),
-                  ))),
-              DataCell(Center(
-                  child: Center(
-                    child: Wrap(
-                        direction: Axis.vertical, //default
-                        alignment: WrapAlignment.center,
-                        children: [
-                          Text(li4.details[list].cUSTOMERNAME.toString(),
-                              textAlign: TextAlign.center)
-                        ]),
-                  ))),
-              DataCell(Center(
-                  child: Center(
-                    child: Wrap(
-                        direction: Axis.vertical, //default
-                        alignment: WrapAlignment.center,
-                        children: [
-                          Text(li4.details[list].tSTARTTIME.toString(),
-                              textAlign: TextAlign.center)
-                        ]),
-                  ))),
-              DataCell(Center(
-                  child: Center(
-                    child: Wrap(
-                        direction: Axis.vertical, //default
-                        alignment: WrapAlignment.center,
-                        children: [
-                          Text(li4.details[list].wSTARTTIME.toString(),
-                              textAlign: TextAlign.center)
-                        ]),
-                  ))),
-              DataCell(Center(
-                  child: Center(
-                    child: Wrap(
-                        direction: Axis.vertical, //default
-                        alignment: WrapAlignment.center,
-                        children: [
-                          Text(li4.details[list].tENDTIME.toString(),
-                              textAlign: TextAlign.center)
-                        ]),
-                  ))),
-              DataCell(Center(
-                  child: Center(
-                    child: Wrap(
-                        direction: Axis.vertical, //default
-                        alignment: WrapAlignment.center,
-                        children: [
-                          Text(li4.details[list].wENDTIME.toString(),
-                              textAlign: TextAlign.center)
-                        ]),
-                  ))),
-                ])
+                              // onSort: (columnIndex, ascending) {
+                              //   onSortColum(columnIndex, ascending);
+                              //   setState(() {
+                              //     sort = !sort;
+                              //   });
+                              // }
+                            ),
 
-                  ],
-                  // rows: li4.details.map((list) => DataRow(cells: [
-                  //       DataCell(Center(
-                  //           child: Center(
-                  //         child: Wrap(
-                  //             direction: Axis.vertical, //default
-                  //             alignment: WrapAlignment.center,
-                  //             children: [
-                  //               Text(
-                  //                 "1",
-                  //                 textAlign: TextAlign.center,
-                  //               )
-                  //             ]),
-                  //       ))),
-                  //       DataCell(Center(
-                  //           child: Center(
-                  //         child: Wrap(
-                  //             direction: Axis.vertical, //default
-                  //             alignment: WrapAlignment.center,
-                  //             children: [
-                  //               Text(list.dOCDATE.toString(),
-                  //                   textAlign: TextAlign.center)
-                  //             ]),
-                  //       ))),
-                  //   DataCell(Center(
-                  //       child: Center(
-                  //         child: Wrap(
-                  //             direction: Axis.vertical, //default
-                  //             alignment: WrapAlignment.center,
-                  //             children: [
-                  //               Text(list.cUSTOMERNAME.toString(),
-                  //                   textAlign: TextAlign.center)
-                  //             ]),
-                  //       ))),
-                  //   DataCell(Center(
-                  //       child: Center(
-                  //         child: Wrap(
-                  //             direction: Axis.vertical, //default
-                  //             alignment: WrapAlignment.center,
-                  //             children: [
-                  //               Text(list.tSTARTTIME.toString(),
-                  //                   textAlign: TextAlign.center)
-                  //             ]),
-                  //       ))),
-                  //   DataCell(Center(
-                  //       child: Center(
-                  //         child: Wrap(
-                  //             direction: Axis.vertical, //default
-                  //             alignment: WrapAlignment.center,
-                  //             children: [
-                  //               Text(list.tENDTIME.toString(),
-                  //                   textAlign: TextAlign.center)
-                  //             ]),
-                  //       ))),
-                  //   DataCell(Center(
-                  //       child: Center(
-                  //         child: Wrap(
-                  //             direction: Axis.vertical, //default
-                  //             alignment: WrapAlignment.center,
-                  //             children: [
-                  //               Text(list.wSTARTTIME.toString(),
-                  //                   textAlign: TextAlign.center)
-                  //             ]),
-                  //       ))),
-                  //   DataCell(Center(
-                  //       child: Center(
-                  //         child: Wrap(
-                  //             direction: Axis.vertical, //default
-                  //             alignment: WrapAlignment.center,
-                  //             children: [
-                  //               Text(list.wENDTIME.toString(),
-                  //                   textAlign: TextAlign.center)
-                  //             ]),
-                  //       ))),
-                  //     ]))
-              )),
+                            DataColumn(
+                              label: Wrap(
+                                direction: Axis.vertical, //default
+                                alignment: WrapAlignment.end,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text("Start",
+                                          softWrap: true,
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.white),
+                                          textAlign: TextAlign.end),
+                                      Divider(
+                                        color: Colors.white,
+                                        thickness: 5,
+                                        height: 5,
+                                      ),
+                                      Text("Travel Start           ",
+                                          softWrap: true,
+                                          style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.white),
+                                          textAlign: TextAlign.end),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              numeric: false,
 
+                              // onSort: (columnIndex, ascending) {
+                              //   onSortColum(columnIndex, ascending);
+                              //   setState(() {
+                              //     sort = !sort;
+                              //   });
+                              // }
+                            ),
+                            DataColumn(
+                              label: Center(
+                                  child: Wrap(
+                                direction: Axis.vertical, //default
+                                alignment: WrapAlignment.center,
+                                children: [
+                                  Text("Time",
+                                      softWrap: true,
+                                      style: TextStyle(
+                                          fontSize: 16, color: Colors.white),
+                                      textAlign: TextAlign.center),
+                                  Divider(
+                                    color: Colors.white,
+                                    thickness: 5,
+                                    height: 5,
+                                  ),
+                                  Text("Work Start",
+                                      softWrap: true,
+                                      style: TextStyle(
+                                          fontSize: 12, color: Colors.white),
+                                      textAlign: TextAlign.center),
+                                ],
+                              )),
+                              numeric: false,
 
-              SizedBox(
-                height: height / 30,
-              ),
-        ])));
+                              // onSort: (columnIndex, ascending) {
+                              //   onSortColum(columnIndex, ascending);
+                              //   setState(() {
+                              //     sort = !sort;
+                              //   });
+                              // }
+                            ),
+                            DataColumn(
+                              label: Wrap(
+                                direction: Axis.vertical, //default
+                                alignment: WrapAlignment.end,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text("End",
+                                          softWrap: true,
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.white),
+                                          textAlign: TextAlign.end),
+                                      Divider(
+                                        color: Colors.white,
+                                        thickness: 5,
+                                        height: 5,
+                                      ),
+                                      Text("Travel End              ",
+                                          softWrap: true,
+                                          style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.white),
+                                          textAlign: TextAlign.end),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              numeric: false,
+
+                              // onSort: (columnIndex, ascending) {
+                              //   onSortColum(columnIndex, ascending);
+                              //   setState(() {
+                              //     sort = !sort;
+                              //   });
+                              // }
+                            ),
+                            DataColumn(
+                              label: Center(
+                                  child: Wrap(
+                                direction: Axis.vertical, //default
+                                alignment: WrapAlignment.center,
+                                children: [
+                                  Text("Time",
+                                      softWrap: true,
+                                      style: TextStyle(
+                                          fontSize: 16, color: Colors.white),
+                                      textAlign: TextAlign.center),
+                                  Divider(
+                                    color: Colors.white,
+                                    thickness: 5,
+                                    height: 5,
+                                  ),
+                                  Text("Work End   ",
+                                      softWrap: true,
+                                      style: TextStyle(
+                                          fontSize: 12, color: Colors.white),
+                                      textAlign: TextAlign.center),
+                                ],
+                              )),
+                              numeric: false,
+
+                              // onSort: (columnIndex, ascending) {
+                              //   onSortColum(columnIndex, ascending);
+                              //   setState(() {
+                              //     sort = !sort;
+                              //   });
+                              // }
+                            ),
+                          ],
+                          rows: [
+                            for (int list = 0;
+                                list < li4.details.length;
+                                list++)
+                              DataRow(cells: [
+                                // DataCell(Center(
+                                //     child: Center(
+                                //   child: Wrap(
+                                //       direction: Axis.vertical, //default
+                                //       alignment: WrapAlignment.center,
+                                //       children: [
+                                //         Text(
+                                //           (list+1).toString(),
+                                //           textAlign: TextAlign.center,
+                                //         )
+                                //       ]),
+                                // ))),
+                                DataCell(Center(
+                                    child: Center(
+                                  child: Wrap(
+                                      direction: Axis.vertical, //default
+                                      alignment: WrapAlignment.center,
+                                      children: [
+                                        Text(
+                                            li4.details[list].dOCDATE
+                                                .toString(),
+                                            textAlign: TextAlign.center)
+                                      ]),
+                                ))),
+                                DataCell(Center(
+                                    child: Center(
+                                  child: Wrap(
+                                      direction: Axis.vertical, //default
+                                      alignment: WrapAlignment.center,
+                                      children: [
+                                        Text(
+                                            li4.details[list].cUSTOMERNAME
+                                                .toString(),
+                                            textAlign: TextAlign.center)
+                                      ]),
+                                ))),
+                                DataCell(Center(
+                                    child: Center(
+                                  child: Wrap(
+                                      direction: Axis.vertical, //default
+                                      alignment: WrapAlignment.center,
+                                      children: [
+                                        Text(
+                                            li4.details[list].tSTARTTIME
+                                                .toString(),
+                                            textAlign: TextAlign.center)
+                                      ]),
+                                ))),
+                                DataCell(Center(
+                                    child: Center(
+                                  child: Wrap(
+                                      direction: Axis.vertical, //default
+                                      alignment: WrapAlignment.center,
+                                      children: [
+                                        Text(
+                                            li4.details[list].wSTARTTIME
+                                                .toString(),
+                                            textAlign: TextAlign.center)
+                                      ]),
+                                ))),
+                                DataCell(Center(
+                                    child: Center(
+                                  child: Wrap(
+                                      direction: Axis.vertical, //default
+                                      alignment: WrapAlignment.center,
+                                      children: [
+                                        Text(
+                                            li4.details[list].tENDTIME
+                                                .toString(),
+                                            textAlign: TextAlign.center)
+                                      ]),
+                                ))),
+                                DataCell(Center(
+                                    child: Center(
+                                  child: Wrap(
+                                      direction: Axis.vertical, //default
+                                      alignment: WrapAlignment.center,
+                                      children: [
+                                        Text(
+                                            li4.details[list].wENDTIME
+                                                .toString(),
+                                            textAlign: TextAlign.center)
+                                      ]),
+                                ))),
+                              ])
+                          ],
+                          // rows: li4.details.map((list) => DataRow(cells: [
+                          //       DataCell(Center(
+                          //           child: Center(
+                          //         child: Wrap(
+                          //             direction: Axis.vertical, //default
+                          //             alignment: WrapAlignment.center,
+                          //             children: [
+                          //               Text(
+                          //                 "1",
+                          //                 textAlign: TextAlign.center,
+                          //               )
+                          //             ]),
+                          //       ))),
+                          //       DataCell(Center(
+                          //           child: Center(
+                          //         child: Wrap(
+                          //             direction: Axis.vertical, //default
+                          //             alignment: WrapAlignment.center,
+                          //             children: [
+                          //               Text(list.dOCDATE.toString(),
+                          //                   textAlign: TextAlign.center)
+                          //             ]),
+                          //       ))),
+                          //   DataCell(Center(
+                          //       child: Center(
+                          //         child: Wrap(
+                          //             direction: Axis.vertical, //default
+                          //             alignment: WrapAlignment.center,
+                          //             children: [
+                          //               Text(list.cUSTOMERNAME.toString(),
+                          //                   textAlign: TextAlign.center)
+                          //             ]),
+                          //       ))),
+                          //   DataCell(Center(
+                          //       child: Center(
+                          //         child: Wrap(
+                          //             direction: Axis.vertical, //default
+                          //             alignment: WrapAlignment.center,
+                          //             children: [
+                          //               Text(list.tSTARTTIME.toString(),
+                          //                   textAlign: TextAlign.center)
+                          //             ]),
+                          //       ))),
+                          //   DataCell(Center(
+                          //       child: Center(
+                          //         child: Wrap(
+                          //             direction: Axis.vertical, //default
+                          //             alignment: WrapAlignment.center,
+                          //             children: [
+                          //               Text(list.tENDTIME.toString(),
+                          //                   textAlign: TextAlign.center)
+                          //             ]),
+                          //       ))),
+                          //   DataCell(Center(
+                          //       child: Center(
+                          //         child: Wrap(
+                          //             direction: Axis.vertical, //default
+                          //             alignment: WrapAlignment.center,
+                          //             children: [
+                          //               Text(list.wSTARTTIME.toString(),
+                          //                   textAlign: TextAlign.center)
+                          //             ]),
+                          //       ))),
+                          //   DataCell(Center(
+                          //       child: Center(
+                          //         child: Wrap(
+                          //             direction: Axis.vertical, //default
+                          //             alignment: WrapAlignment.center,
+                          //             children: [
+                          //               Text(list.wENDTIME.toString(),
+                          //                   textAlign: TextAlign.center)
+                          //             ]),
+                          //       ))),
+                          //     ]))
+                        ))
+                    : Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text("No Details"),
+                      ),
+                SizedBox(
+                  height: height / 30,
+                ),
+              ])));
   }
 }
 
