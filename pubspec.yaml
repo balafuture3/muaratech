@@ -45,6 +45,7 @@ dependencies:
   flutter_launcher_icons: ^0.9.0
   shared_preferences: ^2.0.5
   location: ^3.2.4
+  syncfusion_flutter_datagrid:
 
 dev_dependencies:
   flutter_test:

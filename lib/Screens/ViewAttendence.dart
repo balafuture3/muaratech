@@ -8,6 +8,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:muratech/Models/ViewAttendenceModel.dart';
+import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:xml/xml.dart' as xml;
 
 import '../String_Values.dart';
@@ -38,7 +39,8 @@ class ViewAttendenceState extends State<ViewAttendence> {
   TextEditingController BarCodeorSerialcontroller1 =
       new TextEditingController();
   static List<Filldetails> s = new List();
-
+  List<ViewAttendenceList> employees = <ViewAttendenceList>[];
+  EmployeeDataSource employeeDataSource;
   var stringlist = ["KGS", "LTR", "PSI", "BAR"];
   var dropdownValue1 = "KGS";
   var dropdownValue2 = "KGS";
@@ -63,7 +65,7 @@ class ViewAttendenceState extends State<ViewAttendence> {
 
   var check = false;
 
-  ViewAttendenceList li4;
+  static ViewAttendenceList li4;
   Future<http.Response> GetAttendence() async {
     setState(() {
       loading = true;
@@ -106,6 +108,7 @@ class ViewAttendenceState extends State<ViewAttendence> {
         final decoded = json.decode(parsedXml.text);
         print(decoded);
         li4 = ViewAttendenceList.fromJson(decoded);
+        employeeDataSource = EmployeeDataSource(li4: li4);
         print(li4.details[0].wENDTIME);
       } else
         Fluttertoast.showToast(
@@ -464,8 +467,25 @@ class ViewAttendenceState extends State<ViewAttendence> {
   // }
 
   String date;
+  List<Employee> getEmployeeData() {
+    return [
+      Employee(10001, 'James', 'Project Lead', 20000),
+      Employee(10002, 'Kathryn', 'Manager', 30000),
+      Employee(10003, 'Lara', 'Developer', 15000),
+      Employee(10004, 'Michael', 'Designer', 15000),
+      Employee(10005, 'Martin', 'Developer', 15000),
+      Employee(10006, 'Newberry', 'Developer', 15000),
+      Employee(10007, 'Balnc', 'Developer', 15000),
+      Employee(10008, 'Perry', 'Developer', 15000),
+      Employee(10009, 'Gable', 'Developer', 15000),
+      Employee(10010, 'Grimes', 'Developer', 15000)
+    ];
+  }
+
   @override
   void initState() {
+    // employees = GetAttendence();
+    // employeeDataSource = EmployeeDataSource();
     barcodeenable = true;
     StartDateController.text = DateFormat("dd/MM/yyyy")
         .format(DateTime.now().subtract(Duration(days: 30)));
@@ -492,8 +512,7 @@ class ViewAttendenceState extends State<ViewAttendence> {
         ),
         body: loading
             ? Center(child: CircularProgressIndicator())
-            : SingleChildScrollView(
-                child: Column(children: [
+            : Column(children: [
                 SizedBox(
                   height: height / 30,
                 ),
@@ -601,401 +620,499 @@ class ViewAttendenceState extends State<ViewAttendence> {
                 SizedBox(
                   height: height / 30,
                 ),
-                li4 != null
-                    ? SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: DataTable(
-                          headingRowColor: MaterialStateColor.resolveWith(
-                              (states) => String_values.primarycolor),
-                          columnSpacing: 5,
+                // li4 != null
+                //     ? SingleChildScrollView(
+                //         scrollDirection: Axis.horizontal,
+                //         child: DataTable(
+                //           headingRowColor: MaterialStateColor.resolveWith(
+                //               (states) => String_values.primarycolor),
+                //           columnSpacing: 5,
+                //
+                //           columns: [
+                //             // DataColumn(
+                //             //   label: Center(
+                //             //       child: Wrap(
+                //             //     direction: Axis.vertical, //default
+                //             //     alignment: WrapAlignment.center,
+                //             //     children: [
+                //             //       Text(
+                //             //         "S.No",
+                //             //         softWrap: true,
+                //             //
+                //             //         style: TextStyle(fontSize: 12,color: Colors.white),
+                //             //         textAlign: TextAlign.center,
+                //             //       ),
+                //             //     ],
+                //             //   )),
+                //             //   numeric: false,
+                //             //
+                //             //   // onSort: (columnIndex, ascending) {
+                //             //   //   onSortColum(columnIndex, ascending);
+                //             //   //   setState(() {
+                //             //   //     sort = !sort;
+                //             //   //   });
+                //             //   // }
+                //             // ),
+                //             DataColumn(
+                //               label: Center(
+                //                   child: Wrap(
+                //                 direction: Axis.vertical, //default
+                //                 alignment: WrapAlignment.center,
+                //                 children: [
+                //                   Text("Date",
+                //                       softWrap: true,
+                //                       style: TextStyle(
+                //                           fontSize: 12, color: Colors.white),
+                //                       textAlign: TextAlign.center),
+                //                 ],
+                //               )),
+                //               numeric: false,
+                //
+                //               // onSort: (columnIndex, ascending) {
+                //               //   onSortColum(columnIndex, ascending);
+                //               //   setState(() {
+                //               //     sort = !sort;
+                //               //   });
+                //               // }
+                //             ),
+                //             DataColumn(
+                //               label: Center(
+                //                   child: Wrap(
+                //                 direction: Axis.vertical, //default
+                //                 alignment: WrapAlignment.center,
+                //                 children: [
+                //                   Text("Customer Name",
+                //                       softWrap: true,
+                //                       style: TextStyle(
+                //                           fontSize: 12, color: Colors.white),
+                //                       textAlign: TextAlign.center),
+                //                 ],
+                //               )),
+                //               numeric: false,
+                //
+                //               // onSort: (columnIndex, ascending) {
+                //               //   onSortColum(columnIndex, ascending);
+                //               //   setState(() {
+                //               //     sort = !sort;
+                //               //   });
+                //               // }
+                //             ),
+                //
+                //             DataColumn(
+                //               label: Wrap(
+                //                 direction: Axis.vertical, //default
+                //                 alignment: WrapAlignment.end,
+                //                 children: [
+                //                   Column(
+                //                     crossAxisAlignment: CrossAxisAlignment.end,
+                //                     mainAxisAlignment: MainAxisAlignment.center,
+                //                     children: [
+                //                       Text("Start",
+                //                           softWrap: true,
+                //                           style: TextStyle(
+                //                               fontSize: 16,
+                //                               color: Colors.white),
+                //                           textAlign: TextAlign.end),
+                //                       Divider(
+                //                         color: Colors.white,
+                //                         thickness: 5,
+                //                         height: 5,
+                //                       ),
+                //                       Text("Travel Start           ",
+                //                           softWrap: true,
+                //                           style: TextStyle(
+                //                               fontSize: 12,
+                //                               color: Colors.white),
+                //                           textAlign: TextAlign.end),
+                //                     ],
+                //                   ),
+                //                 ],
+                //               ),
+                //               numeric: false,
+                //
+                //               // onSort: (columnIndex, ascending) {
+                //               //   onSortColum(columnIndex, ascending);
+                //               //   setState(() {
+                //               //     sort = !sort;
+                //               //   });
+                //               // }
+                //             ),
+                //             DataColumn(
+                //               label: Center(
+                //                   child: Wrap(
+                //                 direction: Axis.vertical, //default
+                //                 alignment: WrapAlignment.center,
+                //                 children: [
+                //                   Text("Time",
+                //                       softWrap: true,
+                //                       style: TextStyle(
+                //                           fontSize: 16, color: Colors.white),
+                //                       textAlign: TextAlign.center),
+                //                   Divider(
+                //                     color: Colors.white,
+                //                     thickness: 5,
+                //                     height: 5,
+                //                   ),
+                //                   Text("Work Start",
+                //                       softWrap: true,
+                //                       style: TextStyle(
+                //                           fontSize: 12, color: Colors.white),
+                //                       textAlign: TextAlign.center),
+                //                 ],
+                //               )),
+                //               numeric: false,
+                //
+                //               // onSort: (columnIndex, ascending) {
+                //               //   onSortColum(columnIndex, ascending);
+                //               //   setState(() {
+                //               //     sort = !sort;
+                //               //   });
+                //               // }
+                //             ),
+                //             DataColumn(
+                //               label: Wrap(
+                //                 direction: Axis.vertical, //default
+                //                 alignment: WrapAlignment.end,
+                //                 children: [
+                //                   Column(
+                //                     crossAxisAlignment: CrossAxisAlignment.end,
+                //                     mainAxisAlignment: MainAxisAlignment.center,
+                //                     children: [
+                //                       Text("End",
+                //                           softWrap: true,
+                //                           style: TextStyle(
+                //                               fontSize: 16,
+                //                               color: Colors.white),
+                //                           textAlign: TextAlign.end),
+                //                       Divider(
+                //                         color: Colors.white,
+                //                         thickness: 5,
+                //                         height: 5,
+                //                       ),
+                //                       Text("Travel End              ",
+                //                           softWrap: true,
+                //                           style: TextStyle(
+                //                               fontSize: 12,
+                //                               color: Colors.white),
+                //                           textAlign: TextAlign.end),
+                //                     ],
+                //                   ),
+                //                 ],
+                //               ),
+                //               numeric: false,
+                //
+                //               // onSort: (columnIndex, ascending) {
+                //               //   onSortColum(columnIndex, ascending);
+                //               //   setState(() {
+                //               //     sort = !sort;
+                //               //   });
+                //               // }
+                //             ),
+                //             DataColumn(
+                //               label: Center(
+                //                   child: Wrap(
+                //                 direction: Axis.vertical, //default
+                //                 alignment: WrapAlignment.center,
+                //                 children: [
+                //                   Text("Time",
+                //                       softWrap: true,
+                //                       style: TextStyle(
+                //                           fontSize: 16, color: Colors.white),
+                //                       textAlign: TextAlign.center),
+                //                   Divider(
+                //                     color: Colors.white,
+                //                     thickness: 5,
+                //                     height: 5,
+                //                   ),
+                //                   Text("Work End   ",
+                //                       softWrap: true,
+                //                       style: TextStyle(
+                //                           fontSize: 12, color: Colors.white),
+                //                       textAlign: TextAlign.center),
+                //                 ],
+                //               )),
+                //               numeric: false,
+                //
+                //               // onSort: (columnIndex, ascending) {
+                //               //   onSortColum(columnIndex, ascending);
+                //               //   setState(() {
+                //               //     sort = !sort;
+                //               //   });
+                //               // }
+                //             ),
+                //           ],
+                //           rows: [
+                //             for (int list = 0;
+                //                 list < li4.details.length;
+                //                 list++)
+                //               DataRow(cells: [
+                //                 // DataCell(Center(
+                //                 //     child: Center(
+                //                 //   child: Wrap(
+                //                 //       direction: Axis.vertical, //default
+                //                 //       alignment: WrapAlignment.center,
+                //                 //       children: [
+                //                 //         Text(
+                //                 //           (list+1).toString(),
+                //                 //           textAlign: TextAlign.center,
+                //                 //         )
+                //                 //       ]),
+                //                 // ))),
+                //                 DataCell(Center(
+                //                     child: Center(
+                //                   child: Wrap(
+                //                       direction: Axis.vertical, //default
+                //                       alignment: WrapAlignment.center,
+                //                       children: [
+                //                         Text(
+                //                             li4.details[list].dOCDATE
+                //                                 .toString(),
+                //                             textAlign: TextAlign.center)
+                //                       ]),
+                //                 ))),
+                //                 DataCell(Center(
+                //                     child: Center(
+                //                   child: Wrap(
+                //                       direction: Axis.vertical, //default
+                //                       alignment: WrapAlignment.center,
+                //                       children: [
+                //                         Text(
+                //                             li4.details[list].cUSTOMERNAME
+                //                                 .toString(),
+                //                             textAlign: TextAlign.center)
+                //                       ]),
+                //                 ))),
+                //                 DataCell(Center(
+                //                     child: Center(
+                //                   child: Wrap(
+                //                       direction: Axis.vertical, //default
+                //                       alignment: WrapAlignment.center,
+                //                       children: [
+                //                         Text(
+                //                             li4.details[list].tSTARTTIME
+                //                                 .toString(),
+                //                             textAlign: TextAlign.center)
+                //                       ]),
+                //                 ))),
+                //                 DataCell(Center(
+                //                     child: Center(
+                //                   child: Wrap(
+                //                       direction: Axis.vertical, //default
+                //                       alignment: WrapAlignment.center,
+                //                       children: [
+                //                         Text(
+                //                             li4.details[list].wSTARTTIME
+                //                                 .toString(),
+                //                             textAlign: TextAlign.center)
+                //                       ]),
+                //                 ))),
+                //                 DataCell(Center(
+                //                     child: Center(
+                //                   child: Wrap(
+                //                       direction: Axis.vertical, //default
+                //                       alignment: WrapAlignment.center,
+                //                       children: [
+                //                         Text(
+                //                             li4.details[list].tENDTIME
+                //                                 .toString(),
+                //                             textAlign: TextAlign.center)
+                //                       ]),
+                //                 ))),
+                //                 DataCell(Center(
+                //                     child: Center(
+                //                   child: Wrap(
+                //                       direction: Axis.vertical, //default
+                //                       alignment: WrapAlignment.center,
+                //                       children: [
+                //                         Text(
+                //                             li4.details[list].wENDTIME
+                //                                 .toString(),
+                //                             textAlign: TextAlign.center)
+                //                       ]),
+                //                 ))),
+                //               ])
+                //           ],
+                //           // rows: li4.details.map((list) => DataRow(cells: [
+                //           //       DataCell(Center(
+                //           //           child: Center(
+                //           //         child: Wrap(
+                //           //             direction: Axis.vertical, //default
+                //           //             alignment: WrapAlignment.center,
+                //           //             children: [
+                //           //               Text(
+                //           //                 "1",
+                //           //                 textAlign: TextAlign.center,
+                //           //               )
+                //           //             ]),
+                //           //       ))),
+                //           //       DataCell(Center(
+                //           //           child: Center(
+                //           //         child: Wrap(
+                //           //             direction: Axis.vertical, //default
+                //           //             alignment: WrapAlignment.center,
+                //           //             children: [
+                //           //               Text(list.dOCDATE.toString(),
+                //           //                   textAlign: TextAlign.center)
+                //           //             ]),
+                //           //       ))),
+                //           //   DataCell(Center(
+                //           //       child: Center(
+                //           //         child: Wrap(
+                //           //             direction: Axis.vertical, //default
+                //           //             alignment: WrapAlignment.center,
+                //           //             children: [
+                //           //               Text(list.cUSTOMERNAME.toString(),
+                //           //                   textAlign: TextAlign.center)
+                //           //             ]),
+                //           //       ))),
+                //           //   DataCell(Center(
+                //           //       child: Center(
+                //           //         child: Wrap(
+                //           //             direction: Axis.vertical, //default
+                //           //             alignment: WrapAlignment.center,
+                //           //             children: [
+                //           //               Text(list.tSTARTTIME.toString(),
+                //           //                   textAlign: TextAlign.center)
+                //           //             ]),
+                //           //       ))),
+                //           //   DataCell(Center(
+                //           //       child: Center(
+                //           //         child: Wrap(
+                //           //             direction: Axis.vertical, //default
+                //           //             alignment: WrapAlignment.center,
+                //           //             children: [
+                //           //               Text(list.tENDTIME.toString(),
+                //           //                   textAlign: TextAlign.center)
+                //           //             ]),
+                //           //       ))),
+                //           //   DataCell(Center(
+                //           //       child: Center(
+                //           //         child: Wrap(
+                //           //             direction: Axis.vertical, //default
+                //           //             alignment: WrapAlignment.center,
+                //           //             children: [
+                //           //               Text(list.wSTARTTIME.toString(),
+                //           //                   textAlign: TextAlign.center)
+                //           //             ]),
+                //           //       ))),
+                //           //   DataCell(Center(
+                //           //       child: Center(
+                //           //         child: Wrap(
+                //           //             direction: Axis.vertical, //default
+                //           //             alignment: WrapAlignment.center,
+                //           //             children: [
+                //           //               Text(list.wENDTIME.toString(),
+                //           //                   textAlign: TextAlign.center)
+                //           //             ]),
+                //           //       ))),
+                //           //     ]))
+                //         ))
+                //     : Padding(
+                //         padding: const EdgeInsets.all(16.0),
+                //         child: Text("No Details"),
+                //       ),
+                Expanded(
+                  child: SfDataGrid(
+                    headerRowHeight: 30,
+                    gridLinesVisibility: GridLinesVisibility.both,
+                    headerGridLinesVisibility: GridLinesVisibility.both,
+                    source: employeeDataSource,
 
-                          columns: [
-                            // DataColumn(
-                            //   label: Center(
-                            //       child: Wrap(
-                            //     direction: Axis.vertical, //default
-                            //     alignment: WrapAlignment.center,
-                            //     children: [
-                            //       Text(
-                            //         "S.No",
-                            //         softWrap: true,
-                            //
-                            //         style: TextStyle(fontSize: 12,color: Colors.white),
-                            //         textAlign: TextAlign.center,
-                            //       ),
-                            //     ],
-                            //   )),
-                            //   numeric: false,
-                            //
-                            //   // onSort: (columnIndex, ascending) {
-                            //   //   onSortColum(columnIndex, ascending);
-                            //   //   setState(() {
-                            //   //     sort = !sort;
-                            //   //   });
-                            //   // }
-                            // ),
-                            DataColumn(
-                              label: Center(
-                                  child: Wrap(
-                                direction: Axis.vertical, //default
-                                alignment: WrapAlignment.center,
-                                children: [
-                                  Text("Date",
-                                      softWrap: true,
-                                      style: TextStyle(
-                                          fontSize: 12, color: Colors.white),
-                                      textAlign: TextAlign.center),
-                                ],
-                              )),
-                              numeric: false,
-
-                              // onSort: (columnIndex, ascending) {
-                              //   onSortColum(columnIndex, ascending);
-                              //   setState(() {
-                              //     sort = !sort;
-                              //   });
-                              // }
-                            ),
-                            DataColumn(
-                              label: Center(
-                                  child: Wrap(
-                                direction: Axis.vertical, //default
-                                alignment: WrapAlignment.center,
-                                children: [
-                                  Text("Customer Name",
-                                      softWrap: true,
-                                      style: TextStyle(
-                                          fontSize: 12, color: Colors.white),
-                                      textAlign: TextAlign.center),
-                                ],
-                              )),
-                              numeric: false,
-
-                              // onSort: (columnIndex, ascending) {
-                              //   onSortColum(columnIndex, ascending);
-                              //   setState(() {
-                              //     sort = !sort;
-                              //   });
-                              // }
-                            ),
-
-                            DataColumn(
-                              label: Wrap(
-                                direction: Axis.vertical, //default
-                                alignment: WrapAlignment.end,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text("Start",
-                                          softWrap: true,
-                                          style: TextStyle(
-                                              fontSize: 16,
-                                              color: Colors.white),
-                                          textAlign: TextAlign.end),
-                                      Divider(
-                                        color: Colors.white,
-                                        thickness: 5,
-                                        height: 5,
-                                      ),
-                                      Text("Travel Start           ",
-                                          softWrap: true,
-                                          style: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.white),
-                                          textAlign: TextAlign.end),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              numeric: false,
-
-                              // onSort: (columnIndex, ascending) {
-                              //   onSortColum(columnIndex, ascending);
-                              //   setState(() {
-                              //     sort = !sort;
-                              //   });
-                              // }
-                            ),
-                            DataColumn(
-                              label: Center(
-                                  child: Wrap(
-                                direction: Axis.vertical, //default
-                                alignment: WrapAlignment.center,
-                                children: [
-                                  Text("Time",
-                                      softWrap: true,
-                                      style: TextStyle(
-                                          fontSize: 16, color: Colors.white),
-                                      textAlign: TextAlign.center),
-                                  Divider(
-                                    color: Colors.white,
-                                    thickness: 5,
-                                    height: 5,
-                                  ),
-                                  Text("Work Start",
-                                      softWrap: true,
-                                      style: TextStyle(
-                                          fontSize: 12, color: Colors.white),
-                                      textAlign: TextAlign.center),
-                                ],
-                              )),
-                              numeric: false,
-
-                              // onSort: (columnIndex, ascending) {
-                              //   onSortColum(columnIndex, ascending);
-                              //   setState(() {
-                              //     sort = !sort;
-                              //   });
-                              // }
-                            ),
-                            DataColumn(
-                              label: Wrap(
-                                direction: Axis.vertical, //default
-                                alignment: WrapAlignment.end,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text("End",
-                                          softWrap: true,
-                                          style: TextStyle(
-                                              fontSize: 16,
-                                              color: Colors.white),
-                                          textAlign: TextAlign.end),
-                                      Divider(
-                                        color: Colors.white,
-                                        thickness: 5,
-                                        height: 5,
-                                      ),
-                                      Text("Travel End              ",
-                                          softWrap: true,
-                                          style: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.white),
-                                          textAlign: TextAlign.end),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              numeric: false,
-
-                              // onSort: (columnIndex, ascending) {
-                              //   onSortColum(columnIndex, ascending);
-                              //   setState(() {
-                              //     sort = !sort;
-                              //   });
-                              // }
-                            ),
-                            DataColumn(
-                              label: Center(
-                                  child: Wrap(
-                                direction: Axis.vertical, //default
-                                alignment: WrapAlignment.center,
-                                children: [
-                                  Text("Time",
-                                      softWrap: true,
-                                      style: TextStyle(
-                                          fontSize: 16, color: Colors.white),
-                                      textAlign: TextAlign.center),
-                                  Divider(
-                                    color: Colors.white,
-                                    thickness: 5,
-                                    height: 5,
-                                  ),
-                                  Text("Work End   ",
-                                      softWrap: true,
-                                      style: TextStyle(
-                                          fontSize: 12, color: Colors.white),
-                                      textAlign: TextAlign.center),
-                                ],
-                              )),
-                              numeric: false,
-
-                              // onSort: (columnIndex, ascending) {
-                              //   onSortColum(columnIndex, ascending);
-                              //   setState(() {
-                              //     sort = !sort;
-                              //   });
-                              // }
-                            ),
-                          ],
-                          rows: [
-                            for (int list = 0;
-                                list < li4.details.length;
-                                list++)
-                              DataRow(cells: [
-                                // DataCell(Center(
-                                //     child: Center(
-                                //   child: Wrap(
-                                //       direction: Axis.vertical, //default
-                                //       alignment: WrapAlignment.center,
-                                //       children: [
-                                //         Text(
-                                //           (list+1).toString(),
-                                //           textAlign: TextAlign.center,
-                                //         )
-                                //       ]),
-                                // ))),
-                                DataCell(Center(
-                                    child: Center(
-                                  child: Wrap(
-                                      direction: Axis.vertical, //default
-                                      alignment: WrapAlignment.center,
-                                      children: [
-                                        Text(
-                                            li4.details[list].dOCDATE
-                                                .toString(),
-                                            textAlign: TextAlign.center)
-                                      ]),
-                                ))),
-                                DataCell(Center(
-                                    child: Center(
-                                  child: Wrap(
-                                      direction: Axis.vertical, //default
-                                      alignment: WrapAlignment.center,
-                                      children: [
-                                        Text(
-                                            li4.details[list].cUSTOMERNAME
-                                                .toString(),
-                                            textAlign: TextAlign.center)
-                                      ]),
-                                ))),
-                                DataCell(Center(
-                                    child: Center(
-                                  child: Wrap(
-                                      direction: Axis.vertical, //default
-                                      alignment: WrapAlignment.center,
-                                      children: [
-                                        Text(
-                                            li4.details[list].tSTARTTIME
-                                                .toString(),
-                                            textAlign: TextAlign.center)
-                                      ]),
-                                ))),
-                                DataCell(Center(
-                                    child: Center(
-                                  child: Wrap(
-                                      direction: Axis.vertical, //default
-                                      alignment: WrapAlignment.center,
-                                      children: [
-                                        Text(
-                                            li4.details[list].wSTARTTIME
-                                                .toString(),
-                                            textAlign: TextAlign.center)
-                                      ]),
-                                ))),
-                                DataCell(Center(
-                                    child: Center(
-                                  child: Wrap(
-                                      direction: Axis.vertical, //default
-                                      alignment: WrapAlignment.center,
-                                      children: [
-                                        Text(
-                                            li4.details[list].tENDTIME
-                                                .toString(),
-                                            textAlign: TextAlign.center)
-                                      ]),
-                                ))),
-                                DataCell(Center(
-                                    child: Center(
-                                  child: Wrap(
-                                      direction: Axis.vertical, //default
-                                      alignment: WrapAlignment.center,
-                                      children: [
-                                        Text(
-                                            li4.details[list].wENDTIME
-                                                .toString(),
-                                            textAlign: TextAlign.center)
-                                      ]),
-                                ))),
-                              ])
-                          ],
-                          // rows: li4.details.map((list) => DataRow(cells: [
-                          //       DataCell(Center(
-                          //           child: Center(
-                          //         child: Wrap(
-                          //             direction: Axis.vertical, //default
-                          //             alignment: WrapAlignment.center,
-                          //             children: [
-                          //               Text(
-                          //                 "1",
-                          //                 textAlign: TextAlign.center,
-                          //               )
-                          //             ]),
-                          //       ))),
-                          //       DataCell(Center(
-                          //           child: Center(
-                          //         child: Wrap(
-                          //             direction: Axis.vertical, //default
-                          //             alignment: WrapAlignment.center,
-                          //             children: [
-                          //               Text(list.dOCDATE.toString(),
-                          //                   textAlign: TextAlign.center)
-                          //             ]),
-                          //       ))),
-                          //   DataCell(Center(
-                          //       child: Center(
-                          //         child: Wrap(
-                          //             direction: Axis.vertical, //default
-                          //             alignment: WrapAlignment.center,
-                          //             children: [
-                          //               Text(list.cUSTOMERNAME.toString(),
-                          //                   textAlign: TextAlign.center)
-                          //             ]),
-                          //       ))),
-                          //   DataCell(Center(
-                          //       child: Center(
-                          //         child: Wrap(
-                          //             direction: Axis.vertical, //default
-                          //             alignment: WrapAlignment.center,
-                          //             children: [
-                          //               Text(list.tSTARTTIME.toString(),
-                          //                   textAlign: TextAlign.center)
-                          //             ]),
-                          //       ))),
-                          //   DataCell(Center(
-                          //       child: Center(
-                          //         child: Wrap(
-                          //             direction: Axis.vertical, //default
-                          //             alignment: WrapAlignment.center,
-                          //             children: [
-                          //               Text(list.tENDTIME.toString(),
-                          //                   textAlign: TextAlign.center)
-                          //             ]),
-                          //       ))),
-                          //   DataCell(Center(
-                          //       child: Center(
-                          //         child: Wrap(
-                          //             direction: Axis.vertical, //default
-                          //             alignment: WrapAlignment.center,
-                          //             children: [
-                          //               Text(list.wSTARTTIME.toString(),
-                          //                   textAlign: TextAlign.center)
-                          //             ]),
-                          //       ))),
-                          //   DataCell(Center(
-                          //       child: Center(
-                          //         child: Wrap(
-                          //             direction: Axis.vertical, //default
-                          //             alignment: WrapAlignment.center,
-                          //             children: [
-                          //               Text(list.wENDTIME.toString(),
-                          //                   textAlign: TextAlign.center)
-                          //             ]),
-                          //       ))),
-                          //     ]))
-                        ))
-                    : Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Text("No Details"),
-                      ),
-                SizedBox(
-                  height: height / 30,
+                    // defaultColumnWidth: 100,
+                    columns: <GridColumn>[
+                      GridTextColumn(
+                          columnName: 'date',
+                          label: Container(
+                              color: Colors.indigo,
+                              padding: EdgeInsets.symmetric(horizontal: 16.0),
+                              alignment: Alignment.center,
+                              child: Text(
+                                'Date',
+                                style: TextStyle(color: Colors.white),
+                                overflow: TextOverflow.ellipsis,
+                              ))),
+                      GridTextColumn(
+                          width: 150,
+                          columnName: 'cusname',
+                          label: Container(
+                              color: Colors.indigo,
+                              padding: EdgeInsets.symmetric(horizontal: 16.0),
+                              alignment: Alignment.center,
+                              child: Text(
+                                'Customer Name',
+                                style: TextStyle(color: Colors.white),
+                                overflow: TextOverflow.ellipsis,
+                              ))),
+                      GridTextColumn(
+                          width: 100,
+                          columnName: 'travelstart',
+                          label: Container(
+                              color: Colors.indigo,
+                              padding: EdgeInsets.symmetric(horizontal: 16.0),
+                              alignment: Alignment.center,
+                              child: Text(
+                                'Travel Start',
+                                style: TextStyle(color: Colors.white),
+                                overflow: TextOverflow.ellipsis,
+                              ))),
+                      GridTextColumn(
+                          columnName: 'workstart',
+                          label: Container(
+                              color: Colors.indigo,
+                              padding: EdgeInsets.symmetric(horizontal: 16.0),
+                              alignment: Alignment.center,
+                              child: Text(
+                                'Work Start',
+                                style: TextStyle(color: Colors.white),
+                                overflow: TextOverflow.ellipsis,
+                              ))),
+                      GridTextColumn(
+                          columnName: 'travelend',
+                          label: Container(
+                              color: Colors.indigo,
+                              padding: EdgeInsets.symmetric(horizontal: 16.0),
+                              alignment: Alignment.center,
+                              child: Text(
+                                'Travel End',
+                                style: TextStyle(color: Colors.white),
+                                overflow: TextOverflow.ellipsis,
+                              ))),
+                      GridTextColumn(
+                          columnName: 'workend',
+                          label: Container(
+                              color: Colors.indigo,
+                              padding: EdgeInsets.symmetric(horizontal: 16.0),
+                              alignment: Alignment.center,
+                              child: Text(
+                                'Work End',
+                                style: TextStyle(color: Colors.white),
+                                overflow: TextOverflow.ellipsis,
+                              ))),
+                    ],
+                    stackedHeaderRows: <StackedHeaderRow>[
+                      StackedHeaderRow(cells: [
+                        StackedHeaderCell(
+                            columnNames: ['travelstart', 'workstart'],
+                            child: Container(
+                                color: Colors.indigo,
+                                child: Center(
+                                    child: Text(
+                                  'Start Time',
+                                  style: TextStyle(color: Colors.white),
+                                )))),
+                        StackedHeaderCell(
+                            columnNames: ['travelend', 'workend'],
+                            child: Container(
+                                color: Colors.indigo,
+                                child: Center(
+                                    child: Text('End Time',
+                                        style:
+                                            TextStyle(color: Colors.white)))))
+                      ])
+                    ],
+                  ),
                 ),
-              ])));
+              ]));
   }
 }
 
@@ -1018,4 +1135,61 @@ class Filldetails {
   String ScannedQty;
 
   Filldetails(this.Fillid, this.ItemName, this.DocDate, this.ScannedQty);
+}
+
+/// Custom business object class which contains properties to hold the detailed
+/// information about the employee which will be rendered in datagrid.
+class Employee {
+  /// Creates the employee class with required details.
+  Employee(this.id, this.name, this.designation, this.salary);
+
+  /// Id of an employee.
+  final int id;
+
+  /// Name of an employee.
+  final String name;
+
+  /// Designation of an employee.
+  final String designation;
+
+  /// Salary of an employee.
+  final int salary;
+}
+
+/// An object to set the employee collection data source to the datagrid. This
+/// is used to map the employee data to the datagrid widget.
+class EmployeeDataSource extends DataGridSource {
+  /// Creates the employee data source class with required details.
+  EmployeeDataSource({ViewAttendenceList li4}) {
+    _employeeData = li4.details
+        .map<DataGridRow>((e) => DataGridRow(cells: [
+              DataGridCell<String>(columnName: 'date', value: e.dOCDATE),
+              DataGridCell<String>(
+                  columnName: 'cusname', value: e.cUSTOMERNAME),
+              DataGridCell<String>(
+                  columnName: 'travelstart', value: e.tSTARTTIME),
+              DataGridCell<String>(
+                  columnName: 'workstart', value: e.wSTARTTIME),
+              DataGridCell<String>(columnName: 'travelend', value: e.tENDTIME),
+              DataGridCell<String>(columnName: 'workend', value: e.wENDTIME),
+            ]))
+        .toList();
+  }
+
+  List<DataGridRow> _employeeData = [];
+
+  @override
+  List<DataGridRow> get rows => _employeeData;
+
+  @override
+  DataGridRowAdapter buildRow(DataGridRow row) {
+    return DataGridRowAdapter(
+        cells: row.getCells().map<Widget>((e) {
+      return Container(
+        alignment: Alignment.center,
+        padding: EdgeInsets.all(4.0),
+        child: Text(e.value.toString()),
+      );
+    }).toList());
+  }
 }
