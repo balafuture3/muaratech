@@ -1021,6 +1021,7 @@ class ViewAttendenceState extends State<ViewAttendence> {
                     // defaultColumnWidth: 100,
                     columns: <GridColumn>[
                       GridTextColumn(
+                          width: 150,
                           columnName: 'date',
                           label: Container(
                               color: Colors.indigo,
@@ -1044,7 +1045,7 @@ class ViewAttendenceState extends State<ViewAttendence> {
                                 overflow: TextOverflow.ellipsis,
                               ))),
                       GridTextColumn(
-                          width: 100,
+                          width: 150,
                           columnName: 'travelstart',
                           label: Container(
                               color: Colors.indigo,
@@ -1056,6 +1057,7 @@ class ViewAttendenceState extends State<ViewAttendence> {
                                 overflow: TextOverflow.ellipsis,
                               ))),
                       GridTextColumn(
+                          width: 150,
                           columnName: 'workstart',
                           label: Container(
                               color: Colors.indigo,
@@ -1067,6 +1069,7 @@ class ViewAttendenceState extends State<ViewAttendence> {
                                 overflow: TextOverflow.ellipsis,
                               ))),
                       GridTextColumn(
+                          width: 150,
                           columnName: 'travelend',
                           label: Container(
                               color: Colors.indigo,
@@ -1078,6 +1081,7 @@ class ViewAttendenceState extends State<ViewAttendence> {
                                 overflow: TextOverflow.ellipsis,
                               ))),
                       GridTextColumn(
+                          width: 150,
                           columnName: 'workend',
                           label: Container(
                               color: Colors.indigo,
