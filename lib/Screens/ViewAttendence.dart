@@ -1175,8 +1175,9 @@ class EmployeeDataSource extends DataGridSource {
                   columnName: 'travelstart', value: e.tSTARTTIME),
               DataGridCell<String>(
                   columnName: 'workstart', value: e.wSTARTTIME),
-              DataGridCell<String>(columnName: 'travelend', value: e.tENDTIME),
+
               DataGridCell<String>(columnName: 'workend', value: e.wENDTIME),
+              DataGridCell<String>(columnName: 'travelend', value: e.tENDTIME),
             ]))
         .toList();
   }
