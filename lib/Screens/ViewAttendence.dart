@@ -1021,7 +1021,7 @@ class ViewAttendenceState extends State<ViewAttendence> {
                     // defaultColumnWidth: 100,
                     columns: <GridColumn>[
                       GridTextColumn(
-                          width: 150,
+                          width: 100,
                           columnName: 'date',
                           label: Container(
                               color: Colors.indigo,
@@ -1029,7 +1029,8 @@ class ViewAttendenceState extends State<ViewAttendence> {
                               alignment: Alignment.centerLeft,
                               child: Text(
                                 'Date',
-                                style: TextStyle(color: Colors.white),
+                                style: TextStyle(color: Colors.white,fontSize: 13),
+
                                 overflow: TextOverflow.ellipsis,
                               ))),
                       GridTextColumn(
@@ -1041,11 +1042,11 @@ class ViewAttendenceState extends State<ViewAttendence> {
                               alignment: Alignment.centerLeft,
                               child: Text(
                                 'Customer Name',
-                                style: TextStyle(color: Colors.white),
+                                style: TextStyle(color: Colors.white,fontSize: 13),
                                 overflow: TextOverflow.ellipsis,
                               ))),
                       GridTextColumn(
-                          width: 150,
+                          width: 120,
                           columnName: 'travelstart',
                           label: Container(
                               color: Colors.indigo,
@@ -1053,11 +1054,11 @@ class ViewAttendenceState extends State<ViewAttendence> {
                               alignment: Alignment.center,
                               child: Text(
                                 'Travel Start',
-                                style: TextStyle(color: Colors.white),
+                                style: TextStyle(color: Colors.white,fontSize: 13),
                                 overflow: TextOverflow.ellipsis,
                               ))),
                       GridTextColumn(
-                          width: 150,
+                          width: 100,
                           columnName: 'workstart',
                           label: Container(
                               color: Colors.indigo,
@@ -1065,12 +1066,12 @@ class ViewAttendenceState extends State<ViewAttendence> {
                               alignment: Alignment.center,
                               child: Text(
                                 'Work Start',
-                                style: TextStyle(color: Colors.white),
+                                style: TextStyle(color: Colors.white,fontSize: 13),
                                 overflow: TextOverflow.ellipsis,
                               ))),
 
                       GridTextColumn(
-                          width: 150,
+                          width: 100,
                           columnName: 'workend',
                           label: Container(
                               color: Colors.indigo,
@@ -1078,11 +1079,11 @@ class ViewAttendenceState extends State<ViewAttendence> {
                               alignment: Alignment.center,
                               child: Text(
                                 'Work End',
-                                style: TextStyle(color: Colors.white),
+                                style: TextStyle(color: Colors.white,fontSize: 13),
                                 overflow: TextOverflow.ellipsis,
                               ))),
                       GridTextColumn(
-                          width: 150,
+                          width: 100,
                           columnName: 'travelend',
                           label: Container(
                               color: Colors.indigo,
@@ -1090,7 +1091,7 @@ class ViewAttendenceState extends State<ViewAttendence> {
                               alignment: Alignment.center,
                               child: Text(
                                 'Travel End',
-                                style: TextStyle(color: Colors.white),
+                                style: TextStyle(color: Colors.white,fontSize: 13),
                                 overflow: TextOverflow.ellipsis,
                               ))),
                     ],
@@ -1103,7 +1104,7 @@ class ViewAttendenceState extends State<ViewAttendence> {
                                 child: Center(
                                     child: Text(
                                   'Start Time',
-                                  style: TextStyle(color: Colors.white),
+                                  style: TextStyle(color: Colors.white,fontSize: 13),
                                 )))),
                         StackedHeaderCell(
                             columnNames: ['travelend', 'workend'],
@@ -1112,7 +1113,7 @@ class ViewAttendenceState extends State<ViewAttendence> {
                                 child: Center(
                                     child: Text('End Time',
                                         style:
-                                            TextStyle(color: Colors.white)))))
+                                            TextStyle(color: Colors.white,fontSize: 13)))))
                       ])
                     ],
                   ),
@@ -1167,7 +1168,9 @@ class EmployeeDataSource extends DataGridSource {
   /// Creates the employee data source class with required details.
   EmployeeDataSource({ViewAttendenceList li4}) {
     _employeeData = li4.details
-        .map<DataGridRow>((e) => DataGridRow(cells: [
+        .map<DataGridRow>((e) => DataGridRow(
+
+        cells: [
               DataGridCell<String>(columnName: 'date', value: e.dOCDATE),
               DataGridCell<String>(
                   columnName: 'cusname', value: e.cUSTOMERNAME),
@@ -1194,7 +1197,8 @@ class EmployeeDataSource extends DataGridSource {
       return Container(
         alignment: Alignment.center,
         padding: EdgeInsets.all(4.0),
-        child: Text(e.value.toString()),
+        child: Text(e.value.toString(),style: TextStyle(fontSize: 12),
+        maxLines: 2,overflow: TextOverflow.ellipsis,),
       );
     }).toList());
   }
