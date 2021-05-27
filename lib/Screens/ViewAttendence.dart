@@ -1026,19 +1026,19 @@ class ViewAttendenceState extends State<ViewAttendence> {
                           label: Container(
                               color: Colors.indigo,
                               padding: EdgeInsets.symmetric(horizontal: 16.0),
-                              alignment: Alignment.center,
+                              alignment: Alignment.centerLeft,
                               child: Text(
                                 'Date',
                                 style: TextStyle(color: Colors.white),
                                 overflow: TextOverflow.ellipsis,
                               ))),
                       GridTextColumn(
-                          width: 150,
+                          width: 250,
                           columnName: 'cusname',
                           label: Container(
                               color: Colors.indigo,
                               padding: EdgeInsets.symmetric(horizontal: 16.0),
-                              alignment: Alignment.center,
+                              alignment: Alignment.centerLeft,
                               child: Text(
                                 'Customer Name',
                                 style: TextStyle(color: Colors.white),
@@ -1068,18 +1068,7 @@ class ViewAttendenceState extends State<ViewAttendence> {
                                 style: TextStyle(color: Colors.white),
                                 overflow: TextOverflow.ellipsis,
                               ))),
-                      GridTextColumn(
-                          width: 150,
-                          columnName: 'travelend',
-                          label: Container(
-                              color: Colors.indigo,
-                              padding: EdgeInsets.symmetric(horizontal: 16.0),
-                              alignment: Alignment.center,
-                              child: Text(
-                                'Travel End',
-                                style: TextStyle(color: Colors.white),
-                                overflow: TextOverflow.ellipsis,
-                              ))),
+
                       GridTextColumn(
                           width: 150,
                           columnName: 'workend',
@@ -1089,6 +1078,18 @@ class ViewAttendenceState extends State<ViewAttendence> {
                               alignment: Alignment.center,
                               child: Text(
                                 'Work End',
+                                style: TextStyle(color: Colors.white),
+                                overflow: TextOverflow.ellipsis,
+                              ))),
+                      GridTextColumn(
+                          width: 150,
+                          columnName: 'travelend',
+                          label: Container(
+                              color: Colors.indigo,
+                              padding: EdgeInsets.symmetric(horizontal: 16.0),
+                              alignment: Alignment.center,
+                              child: Text(
+                                'Travel End',
                                 style: TextStyle(color: Colors.white),
                                 overflow: TextOverflow.ellipsis,
                               ))),
