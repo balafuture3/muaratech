@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -1026,7 +1027,7 @@ class ViewAttendenceState extends State<ViewAttendence> {
                           label: Container(
                               color: Colors.indigo,
                               padding: EdgeInsets.symmetric(horizontal: 16.0),
-                              alignment: Alignment.centerLeft,
+                              alignment: Alignment.center,
                               child: Text(
                                 'Date',
                                 style: TextStyle(color: Colors.white,fontSize: 13),
@@ -1039,14 +1040,14 @@ class ViewAttendenceState extends State<ViewAttendence> {
                           label: Container(
                               color: Colors.indigo,
                               padding: EdgeInsets.symmetric(horizontal: 16.0),
-                              alignment: Alignment.centerLeft,
+                              alignment: Alignment.center,
                               child: Text(
                                 'Customer Name',
                                 style: TextStyle(color: Colors.white,fontSize: 13),
                                 overflow: TextOverflow.ellipsis,
                               ))),
                       GridTextColumn(
-                          width: 120,
+                          width: 140,
                           columnName: 'travelstart',
                           label: Container(
                               color: Colors.indigo,
@@ -1058,7 +1059,7 @@ class ViewAttendenceState extends State<ViewAttendence> {
                                 overflow: TextOverflow.ellipsis,
                               ))),
                       GridTextColumn(
-                          width: 100,
+                          width: 120,
                           columnName: 'workstart',
                           label: Container(
                               color: Colors.indigo,
@@ -1071,7 +1072,7 @@ class ViewAttendenceState extends State<ViewAttendence> {
                               ))),
 
                       GridTextColumn(
-                          width: 100,
+                          width: 120,
                           columnName: 'workend',
                           label: Container(
                               color: Colors.indigo,
@@ -1083,7 +1084,7 @@ class ViewAttendenceState extends State<ViewAttendence> {
                                 overflow: TextOverflow.ellipsis,
                               ))),
                       GridTextColumn(
-                          width: 100,
+                          width: 120,
                           columnName: 'travelend',
                           label: Container(
                               color: Colors.indigo,
@@ -1195,7 +1196,7 @@ class EmployeeDataSource extends DataGridSource {
     return DataGridRowAdapter(
         cells: row.getCells().map<Widget>((e) {
       return Container(
-        alignment: Alignment.center,
+        alignment: e.columnName=="cusname"?Alignment.centerLeft:Alignment.center,
         padding: EdgeInsets.all(4.0),
         child: Text(e.value.toString(),style: TextStyle(fontSize: 12),
         maxLines: 2,overflow: TextOverflow.ellipsis,),
