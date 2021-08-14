@@ -4,6 +4,7 @@ import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:muratech/Models/LoginModel.dart';
+import 'package:muratech/Screens/ForgotPassword1.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:xml/xml.dart' as xml;
 import 'package:http/http.dart'as http;
@@ -126,6 +127,97 @@ class LoginScreenState extends State<LoginScreen> {
     return response;
   }
 
+  Future<http.Response> UserFindRequest() async {
+    setState(() {
+      loading = true;
+    });
+    var envelope = '''<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <IN_MOB_LAST_RECORD xmlns="http://tempuri.org/">
+      <FormID>7</FormID>
+      <DocNo>0</DocNo>
+      <UserID>0</UserID>
+      <WhsCode></WhsCode>
+      <Other>${emailController.text}</Other>
+    </IN_MOB_LAST_RECORD>
+  </soap:Body>
+</soap:Envelope>''';
+    print(envelope);
+    var url =
+        'http://15.206.119.30:2021/Muratech/Service.asmx?op=IN_MOB_LAST_RECORD';
+    // Map data = {
+    //   "username": EmailController.text,
+    //   "password": PasswordController.text
+    // };
+//    print("data: ${data}");
+//    print(String_values.base_url);
+
+    var response = await http.post(url,
+        headers: {
+          "Content-Type": "text/xml; charset=utf-8",
+        },
+        body: envelope);
+    if (response.statusCode == 200) {
+      setState(() {
+        loading = false;
+      });
+
+      xml.XmlDocument parsedXml = xml.XmlDocument.parse(response.body);
+      print(parsedXml.text);
+      if (parsedXml.text != "[]")
+      {
+
+
+        final decoded = json.decode(parsedXml.text);
+
+        li3 = LoginModel.fromJson(decoded[0]);
+        print(li3.firstName);
+        empID= li3.empID;
+        homeLoc=li3.homLoc;
+        // setRegistered(li3.firstName, li3.empID,li3.homLoc);
+        // Fluttertoast.showToast(
+        //     msg:"Login Success",
+        //     toastLength: Toast.LENGTH_LONG,
+        //     gravity: ToastGravity.SNACKBAR,
+        //     timeInSecForIosWeb: 1,
+        //     backgroundColor: String_values.primarycolor,
+        //     textColor: Colors.white,
+        //     fontSize: 16.0);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  ForgotPassword1()),
+        );
+
+      } else
+        Fluttertoast.showToast(
+            msg: "No users found",
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.SNACKBAR,
+            timeInSecForIosWeb: 1,
+            backgroundColor: String_values.primarycolor,
+            textColor: Colors.white,
+            fontSize: 16.0);
+    } else {
+      Fluttertoast.showToast(
+          msg: "Http error!, Response code ${response.statusCode}",
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.SNACKBAR,
+          timeInSecForIosWeb: 1,
+          backgroundColor: String_values.primarycolor,
+          textColor: Colors.white,
+          fontSize: 16.0);
+      setState(() {
+        loading = false;
+      });
+      print("Retry");
+    }
+    // print("response: ${response.statusCode}");
+    // print("response: ${response.body}");
+    return response;
+  }
+
   Future<bool> check() async {
     var connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult == ConnectivityResult.mobile) {
@@ -148,7 +240,8 @@ class LoginScreenState extends State<LoginScreen> {
   static TextEditingController emailController = new TextEditingController();
   static TextEditingController passwordController = new TextEditingController();
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context)
+  {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
     return Scaffold(
@@ -256,33 +349,48 @@ class LoginScreenState extends State<LoginScreen> {
               SizedBox(
                 height: height / 50,
               ),
-              // Container(
-              //   child: Row(
-              //     mainAxisAlignment: MainAxisAlignment.end,
-              //     children: <Widget>[
-              //       GestureDetector(
-              //         onTap: () {},
-              //         child: Padding(
-              //           padding: const EdgeInsets.only(right: 24.0),
-              //           child: GestureDetector(
-              //             child: Container(
-              //               padding: const EdgeInsets.all(16.0),
-              //               child: Text("Forgot Password?",style: TextStyle(color: String_values.primarycolor),),
-              //             ),
-              //             onTap: () {
-              //               // Navigator.pushReplacement(
-              //               //   context,
-              //               //   MaterialPageRoute(
-              //               //       builder: (context) =>
-              //               //           ForgotPasswordPage()),
-              //               // );
-              //             },
-              //           ),
-              //         ),
-              //       ),
-              //     ],
-              //   ),
-              // ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(right: 24.0),
+                    child: GestureDetector(
+                      child: Container(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text("Forgot Password?",style: TextStyle(color: String_values.primarycolor),),
+                      ),
+                      onTap: () {
+                        if(emailController.text.isEmpty)
+                        showDialog(
+                            context: (context),
+                            builder:
+                                (BuildContext context) {
+                              return AlertDialog(
+                                title: Text("Warning"),
+                                content:
+                                SingleChildScrollView(
+                                  child: Column(
+                                    children: [
+                                      Text("Enter the User ID"),
+                                    ],
+                                  ),
+                                ),
+                                actions: [
+                                  InkWell(child: TextButton( onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text("OK"),))
+                                ],
+                              );
+                            });
+                        else
+                          UserFindRequest();
+
+                      },
+                    ),
+                  ),
+                ],
+              ),
               SizedBox(
                 height: height / 25,
               ),

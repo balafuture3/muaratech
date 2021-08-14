@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -67,6 +66,9 @@ class ViewAttendenceState extends State<ViewAttendence> {
   var check = false;
 
   static ViewAttendenceList li4;
+
+  String startdate;
+  String enddate;
   Future<http.Response> GetAttendence() async {
     setState(() {
       loading = true;
@@ -77,8 +79,8 @@ class ViewAttendenceState extends State<ViewAttendence> {
   <soap:Body>
     <IN_MOB_TRAVEL_REPORT1 xmlns="http://tempuri.org/">
       <USERID>${LoginScreenState.empID}</USERID>
-      <FromDate>${StartDateController.text}</FromDate>
-      <ToDate>${EndDateController.text}</ToDate>
+      <FromDate>${startdate}</FromDate>
+      <ToDate>${enddate}</ToDate>
     </IN_MOB_TRAVEL_REPORT1>
   </soap:Body>
 </soap:Envelope>
@@ -489,8 +491,12 @@ class ViewAttendenceState extends State<ViewAttendence> {
     // employeeDataSource = EmployeeDataSource();
     barcodeenable = true;
     StartDateController.text = DateFormat("dd/MM/yyyy")
-        .format(DateTime.now().subtract(Duration(days: 30)));
+        .format(DateTime.now().subtract(Duration(days: 7)));
+    startdate=DateFormat("yyyy/MM/dd")
+        .format(DateTime.now().subtract(Duration(days: 7)));
     EndDateController.text = DateFormat("dd/MM/yyyy").format(DateTime.now());
+    enddate=DateFormat("yyyy/MM/dd")
+        .format(DateTime.now());
     // StartDateController1.text = DateFormat("yyyy-MM-dd")
     //     .format(DateTime.now().subtract(Duration(days: 30)));
     // EndDateController1.text = DateFormat("yyyy-MM-dd").format(DateTime.now());
@@ -543,6 +549,11 @@ class ViewAttendenceState extends State<ViewAttendence> {
                                     date.month.toString().padLeft(2, "0") +
                                     '/' +
                                     date.year.toString();
+                            startdate=date.year.toString() +
+                                '/' +
+                                date.month.toString().padLeft(2, "0") +
+                                '/' +date.day.toString().padLeft(2, "0");
+
                             // AssetList();
                           },
                           enabled: true,
@@ -582,6 +593,10 @@ class ViewAttendenceState extends State<ViewAttendence> {
                                     date.month.toString().padLeft(2, "0") +
                                     '/' +
                                     date.year.toString();
+                            enddate=date.year.toString() +
+                                '/' +
+                                date.month.toString().padLeft(2, "0") +
+                                '/' +date.day.toString().padLeft(2, "0");
                             // AssetList();
                           },
                           enabled: true,
