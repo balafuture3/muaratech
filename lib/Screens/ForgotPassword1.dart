@@ -140,16 +140,20 @@ else
     print(response.body);
     if (response.statusCode == 200)
     {
-
-      liRes = ResponseModel.fromJson(jsonDecode(response.body));
-      if(liRes.status==200) {
-        OTPsave();
-
+      if(dropdownValue1=="Mobile") {
+        liRes = ResponseModel.fromJson(jsonDecode(response.body));
+        if (liRes.status == 200) {
+          OTPsave();
+        }
+        else
+          Fluttertoast.showToast(msg: liRes.message);
       }
-      else
-        Fluttertoast.showToast(msg: liRes.message);
-
-      setState(() {
+      else {
+        Fluttertoast.showToast(msg: "Link send to your Email");
+        Navigator.pushAndRemoveUntil(
+            context, MaterialPageRoute(builder: (builder) => LoginScreen()), (
+            route) => false);
+      }setState(() {
         loading = false;
       });
 
