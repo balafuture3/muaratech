@@ -138,7 +138,8 @@ else
 
     var response = await http.get(url);
     print(response.body);
-    if (response.statusCode == 200) {
+    if (response.statusCode == 200)
+    {
 
       liRes = ResponseModel.fromJson(jsonDecode(response.body));
       if(liRes.status==200) {
@@ -147,6 +148,10 @@ else
       }
       else
         Fluttertoast.showToast(msg: liRes.message);
+
+      setState(() {
+        loading = false;
+      });
 
       // print(liZip
       //     .details[0].zIPCODE);
