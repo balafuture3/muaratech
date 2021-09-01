@@ -178,7 +178,8 @@ useridController.text=LoginScreenState.emailController.text;
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context)
+  {
     final width = MediaQuery
         .of(context)
         .size
